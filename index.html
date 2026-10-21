@@ -99,7 +99,9 @@ button{cursor:pointer}
 .empty{text-align:center;color:var(--muted);padding:40px 20px}
 .empty .big{font-size:42px}
 /* Botão principal */
-.fab{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + var(--safe-b));width:min(612px,calc(100% - 28px));height:58px;border:0;border-radius:16px;background:var(--acc);color:#fff;font-size:18px;font-weight:600;box-shadow:0 4px 14px rgba(120,90,50,.25);display:flex;align-items:center;justify-content:center;gap:8px}
+.fabs{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + var(--safe-b));width:min(612px,calc(100% - 28px));display:flex;gap:8px;z-index:5}
+.fab2{flex:0 0 auto;height:58px;padding:0 14px;border:1.5px solid var(--acc);border-radius:16px;background:var(--card);color:var(--txt);font-size:15px;font-weight:600;white-space:nowrap;box-shadow:0 4px 14px rgba(120,90,50,.15)}
+.fab{flex:1;min-width:0;white-space:nowrap;height:58px;border:0;border-radius:16px;background:var(--acc);color:#fff;font-size:18px;font-weight:600;box-shadow:0 4px 14px rgba(120,90,50,.25);display:flex;align-items:center;justify-content:center;gap:8px}
 /* Folhas (ecrãs por cima) */
 .sheet{position:fixed;inset:0;background:var(--bg);display:none;flex-direction:column;z-index:10}
 .sheet.show{display:flex}
@@ -193,7 +195,7 @@ textarea.field{height:auto;min-height:46vh;padding:10px;resize:none;line-height:
   <div class="calv" id="cal" hidden></div>
   <div class="list" id="list" hidden></div>
 </div>
-<button class="fab" id="bNew">🎙️ Novo Registo</button>
+<div class="fabs"><button class="fab" id="bNew">🎙️ Novo Registo</button><button class="fab2" id="bPaste">📋 Do Dictafone</button></div>
 
 <!-- Novo / editar registo -->
 <div class="sheet" id="sEdit">
@@ -538,14 +540,20 @@ $('list').onclick=async e=>{
 /* ---------- Novo / editar ---------- */
 function show(id){document.querySelectorAll('.sheet').forEach(s=>s.classList.remove('show'));if(id)$(id).classList.add('show')}
 document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>show(null));
-function openEdit(e){
+function openEdit(e,title){
   st.editId=e?e.id:null;
-  $('eTitle').textContent=e?'✏️ Editar Registo':'🎙️ Novo Registo';
+  $('eTitle').textContent=title||(e?'✏️ Editar Registo':'🎙️ Novo Registo');
   $('eDate').value=toLocalInput(e?new Date(e.date):new Date());
   $('eText').value=e?e.text:'';
   show('sEdit');setTimeout(()=>$('eText').focus(),50);
 }
 $('bNew').onclick=()=>Rec.start();
+$('bPaste').onclick=async()=>{ // texto copiado no Dictafone: entra com um toque
+  let t='';try{t=(await navigator.clipboard.readText()||'').trim()}catch{}
+  openEdit(null,'📋 Do Dictafone');
+  if(t){$('eText').value=t;$('eText').blur();toast('Confirma a data e guarda')}
+  else toast('Toca na caixa e escolhe Colar');
+};
 $('eCancel').onclick=()=>{if($('eText').value.trim()&&!st.editId&&!confirm('Sair sem guardar?'))return;show(null)};
 $('eSave').onclick=async()=>{
   const text=$('eText').value.trim();if(!text){toast('O texto está vazio');return}
