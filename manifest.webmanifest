@@ -1,6 +1,6 @@
 {
-  "name": "Diário",
-  "short_name": "Diário",
+  "name": "Voice Journal",
+  "short_name": "Journal",
   "lang": "pt-PT",
   "start_url": "./",
   "scope": "./",

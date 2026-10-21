@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Diário</title>
+<title>Voice Journal</title>
 <meta name="theme-color" content="#f5f0e6">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Diário">
+<meta name="apple-mobile-web-app-title" content="Voice Journal">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" href="icon-192.png">
@@ -28,12 +28,23 @@ button{cursor:pointer}
 /* Topo fixo */
 .top{flex:none;padding:calc(10px + var(--safe-t)) 14px 6px;border-bottom:1px solid var(--line);background:var(--bg)}
 .bar{display:flex;align-items:center;gap:8px}
-.bar h1{margin:0;font-size:20px;font-weight:650;flex:1;white-space:nowrap}
+.brand{flex:1;min-width:0;line-height:1.15}
+.brand .bt{font-size:20px;font-weight:700;white-space:nowrap}
+.brand .bs{font-size:11.5px;color:var(--muted);letter-spacing:.3px;margin-left:30px}
+.tabs{display:flex;gap:6px;margin-top:10px}
+.tabs button{flex:1;height:44px;border:1px solid var(--line);background:var(--card);border-radius:12px;font-size:15px;font-weight:600;color:var(--muted)}
+.tabs button.on{background:var(--acc-soft);border-color:var(--acc);color:var(--txt)}
+.cloud{flex:1;overflow-y:auto;padding:16px 14px calc(96px + var(--safe-b));display:flex;flex-wrap:wrap;align-content:center;justify-content:center;align-items:center;gap:4px 12px}
+.cloud .w{border:0;background:none;padding:2px 3px;line-height:1.1;font-weight:600;border-radius:8px}
+.cloud .w:active{background:var(--acc-soft)}
+.cloud .c0{color:#9c7a4f}.cloud .c1{color:#7d8a6a}.cloud .c2{color:#a86f5b}.cloud .c3{color:#6f7f8f}.cloud .c4{color:#8a6f8f}
+.cloud .empty{width:100%}
 .icon-btn{border:1px solid var(--line);background:var(--card);border-radius:10px;height:36px;min-width:36px;padding:0 9px;font-size:17px;display:inline-flex;align-items:center;justify-content:center;gap:5px}
 .icon-btn small{font-size:13px}
 .filters{display:flex;gap:6px;margin-top:8px}
 .filters select,.filters input{height:36px;border:1px solid var(--line);background:var(--card);border-radius:10px;padding:0 8px;min-width:0}
-.filters select{flex:0 0 auto;max-width:42%}
+.filters select{flex:1 1 auto;max-width:none}
+.filters:has(input:not([hidden])) select{flex:0 0 auto;max-width:42%}
 .filters input{flex:1}
 .words{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;max-height:62px;overflow:hidden}
 .words.open{max-height:none}
@@ -104,7 +115,10 @@ textarea.field{height:auto;min-height:46vh;padding:10px;resize:none;line-height:
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.8)}}
 .timer{font-size:28px;font-weight:650;font-variant-numeric:tabular-nums}
 .rec-state{text-align:center;font-size:13px;color:var(--muted);min-height:18px}
-.live{flex:1;overflow-y:auto;margin:10px 14px;padding:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;white-space:pre-wrap;font-size:16px;line-height:1.5}
+.live{flex:1;overflow-y:auto;margin:10px 14px;padding:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;font-size:16px;line-height:1.5;resize:none;width:auto;font-family:inherit;color:var(--txt);outline:none}
+.kb{margin:8px 14px 0;padding:10px 12px;border-radius:14px;background:var(--acc-soft);text-align:center;font-size:14px;color:var(--txt)}
+.kb .btn{margin-top:8px;width:100%;flex:none;height:54px}
+.kb .retry{margin-top:6px;border:0;background:none;color:var(--acc);font-size:13px}
 .live .int{color:var(--muted)}
 .live .ph{color:var(--muted);font-style:italic}
 .alarm{display:none;margin:0 14px;padding:14px;border-radius:14px;background:#c0574a;color:#fff;font-weight:600;text-align:center;font-size:16px}
@@ -126,10 +140,11 @@ textarea.field{height:auto;min-height:46vh;padding:10px;resize:none;line-height:
 <div class="app">
   <div class="top">
     <div class="bar">
-      <h1>📖 Diário</h1>
+      <div class="brand"><div class="bt">🎙️ Voice Journal</div><div class="bs">by Orya Advisory</div></div>
       <button class="icon-btn" id="bExport" aria-label="Exportar">📤 <small>Exportar</small></button>
       <button class="icon-btn" id="bSettings" aria-label="Definições">⚙️</button>
     </div>
+    <div class="tabs" id="tabs"><button data-v="cloud" class="on">☁️ Temas</button><button data-v="list">📖 Registos</button></div>
     <div class="filters">
       <select id="fPeriod" aria-label="Período">
         <option value="all">📅 Tudo</option>
@@ -139,12 +154,13 @@ textarea.field{height:auto;min-height:46vh;padding:10px;resize:none;line-height:
         <option value="lastmonth">📅 Mês passado</option>
         <option value="year">📅 Este ano</option>
       </select>
-      <input id="fSearch" type="search" placeholder="🔍 Pesquisar" autocomplete="off">
+      <input id="fSearch" type="search" placeholder="🔍 Pesquisar" autocomplete="off" hidden>
     </div>
     <div class="words" id="words"></div>
     <div class="info"><span id="count"></span><button id="bClear" hidden>✕ Limpar filtros</button></div>
   </div>
-  <div class="list" id="list"></div>
+  <div class="cloud" id="cloud"></div>
+  <div class="list" id="list" hidden></div>
 </div>
 <button class="fab" id="bNew">🎙️ Novo Registo</button>
 
@@ -168,7 +184,8 @@ textarea.field{height:auto;min-height:46vh;padding:10px;resize:none;line-height:
   <div class="rec-top"><span class="dot"></span><span class="timer" id="rTimer">0:00</span></div>
   <div class="rec-state" id="rState">A ouvir…</div>
   <div class="alarm" id="rAlarm">⚠️ A gravação parou<br><small>Toca aqui para continuar</small></div>
-  <div class="live" id="rLive"><span class="ph">Começa a falar…</span></div>
+  <div class="kb" id="rKb" hidden><span id="rKbMsg"></span><button class="btn pri" id="rKbBtn">⌨️ Ditar pelo Teclado</button><button class="retry" id="rAuto" hidden>🔄 Tentar a transcrição automática</button></div>
+  <textarea class="live" id="rText" placeholder="Começa a falar…"></textarea>
   <div class="rec-btns">
     <button class="btn" id="rCancel">✕ Cancelar</button>
     <button class="btn pri stop" id="rSave">✔️ Parar e Guardar</button>
@@ -254,7 +271,7 @@ const DB={db:null,
 
 /* ---------- Estado ---------- */
 let entries=[];               // {id,date(ISO),text}
-const st={period:'all',q:'',word:null,openId:null,wordsOpen:false,editId:null,fmt:'txt'};
+const st={period:'all',q:'',word:null,openId:null,wordsOpen:false,editId:null,fmt:'txt',view:'cloud'};
 const $=id=>document.getElementById(id);
 
 /* ---------- Utilitários ---------- */
@@ -286,7 +303,36 @@ saber sei sabe sabia achar acho acha achei pensar penso pensei falar falo falei
 ok okay pronto tipo coisa coisas cena cenas pá né ah eh oh hum hmm uh ai olha olhe bem bom boa enfim portanto entanto aliás
 hoje ontem amanhã agora depois antes sempre nunca vez vezes dia dias hora horas ano anos agora talvez
 então tal tais cada outro outra outros outras mesmo mesma mesmos mesmas próprio própria qualquer quaisquer
-the and of to in is it that for on with as was are be this have i you he she we they not but or at`).split(/\s+/));
+the and of to in is it that for on with as was are be this have i you he she we they not but or at
+basicamente efetivamente realmente simplesmente obviamente provavelmente exatamente principalmente totalmente completamente honestamente normalmente finalmente
+calhar bocado bocadinho imenso imensa imensos imensas bué super mega pouca poucos poucas alguns algumas algum alguma nenhum nenhuma vários várias
+porquê enquanto embora caso conforme segundo durante perante através apenas somente quase cerca acerca demais bastante
+aquela aqueles daquele daquela disso disto daquilo nisso nisto naquilo dessa desse desta deste dessas desses destas destes nessa nesse nesta neste
+estava estávamos estavam estive estivemos estiver estiverem estando estarei estaria
+tenha tenhamos tenham tivesse tiver tiverem tendo terei teremos teriam tínhamos
+somos fomos fosse fossem formos serei seremos seriam sermos
+vamos fomos iria irá irão vindo vir venho vem vêm veio vieram
+consigo consegue conseguimos conseguem consegui conseguiu conseguir conseguia conseguiria
+preciso precisa precisamos precisam precisava precisar precisei
+quero queremos querem queria queriam quiser gostava gostaria
+devo deve devemos devem devia deviam deveria dever
+fico fica ficamos ficam fiquei ficou ficar ficava
+acho achas achamos acham achei achou achava pensei pensava
+digo dizes dizemos dizem disse dizer dizia diga dito
+falo falas falamos falam falei falou falar falava
+estás estamos está estão tens temos têm
+faço fazes fazemos fazem fiz fez fizemos fizeram fazer fazia feito feita
+vejo vês vemos veem vi viu ver via visto vista
+sei sabes sabemos sabem soube saber sabia
+dá dou damos dão dei deu dar dava
+pôr pus pôs ponho põe pomos põem
+coisa coisas cena cenas parte partes forma maneira modo género gênero lado vez vezes momento altura sítio
+né pá ah eh oh hum hmm uh ai olha olhe ora bem bom boa enfim portanto entanto aliás pronto tipo ok okay sim
+hoje ontem amanhã agora depois antes sempre nunca logo cedo tarde talvez ainda já
+gente pessoal malta mesmo mesma próprio própria certo certa claro verdade exemplo
+primeiro primeira segundo segunda terceiro último última próximo próxima outra outro outras outros
+grande grandes pequeno pequena pequenos pequenas melhor pior maior menor novo nova novos novas
+dois duas três quatro cinco seis sete oito nove dez cem mil milhão`).split(/\s+/));
 
 function tokens(text){return (norm(text).match(/[a-zçñ]+(?:-[a-z]+)*/g)||[])}
 const DISP=new Map(); // palavra sem acentos -> como se escreve
@@ -325,7 +371,7 @@ function renderWords(base){
   if(st.word&&!top.find(([w])=>w===st.word))top.unshift([st.word,freq.get(st.word)||0]);
   const box=$('words');
   if(!top.length){box.innerHTML='';box.hidden=true;return}
-  box.hidden=false;
+  box.hidden=st.view!=='list';
   const max=top[0][1]||1;
   box.innerHTML=top.map(([w,n])=>{const l=n>=max*.66?'l3':n>=max*.33?'l2':'';return`<button class="chip ${l}${st.word===w?' on':''}" data-w="${esc(w)}">${esc(disp(w))}<b>${n}</b></button>`}).join('');
   box.classList.toggle('open',st.wordsOpen);
@@ -350,9 +396,29 @@ function hl(text){
   for(const[a,b]of marks){if(a<p)continue;out+=h.slice(p,a)+'<mark>'+h.slice(a,b)+'</mark>';p=b}
   return out+h.slice(p);
 }
+function topWords(base,n){
+  const freq=new Map();
+  for(const e of base){const seen=new Set();
+    for(const w of tokens(e.text)){if(w.length<4||STOP.has(w)||seen.has(w))continue;seen.add(w);freq.set(w,(freq.get(w)||0)+1)}}
+  return [...freq].sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])).slice(0,n);
+}
+function renderCloud(base){
+  const C=$('cloud');
+  const top=topWords(base,45).filter(([,n])=>n>=2||base.length<4);
+  if(!top.length){C.innerHTML=`<div class="empty"><div class="big">☁️</div><p>${entries.length?'Ainda não há palavras repetidas neste período.':'As palavras de que mais falas aparecem aqui.<br>Carrega em <b>Novo Registo</b> para começar.'}</p></div>`;return}
+  const max=top[0][1],min=top[top.length-1][1];
+  // as maiores ao centro, as outras alternadas para os lados
+  const arr=[];top.forEach((x,i)=>i%2?arr.push(x):arr.unshift(x));
+  C.innerHTML=arr.map(([w,n])=>{const f=max===min?1:(n-min)/(max-min);const size=Math.round(15+f*27);
+    return`<button class="w c${w.length%5}" style="font-size:${size}px" data-w="${esc(w)}" title="${n} registos">${esc(disp(w))}</button>`}).join('');
+}
+function setView(v){st.view=v;document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
+  $('cloud').hidden=v!=='cloud';$('list').hidden=v!=='list';$('fSearch').hidden=v!=='list';render()}
 function render(){
   const base=baseFiltered();
+  renderCloud(base);
   renderWords(base);
+  $('words').hidden=st.view!=='list'||!$('words').innerHTML;
   const list=st.word?base.filter(e=>hasWord(e,st.word)):base;
   const L=$('list');
   const filt=st.period!=='all'||st.q||st.word;
@@ -379,6 +445,8 @@ async function load(){entries=(await DB.all()).sort((a,b)=>b.date.localeCompare(
 $('fPeriod').onchange=e=>{st.period=e.target.value;render()};
 $('fSearch').oninput=e=>{st.q=e.target.value.trim();render()};
 $('bClear').onclick=()=>{st.period='all';st.q='';st.word=null;$('fPeriod').value='all';$('fSearch').value='';render()};
+$('tabs').onclick=e=>{const b=e.target.closest('button');if(b)setView(b.dataset.v)};
+$('cloud').onclick=e=>{const b=e.target.closest('.w');if(!b)return;st.word=b.dataset.w;st.openId=null;setView('list');$('list').scrollTop=0};
 $('words').onclick=e=>{const b=e.target.closest('button');if(!b)return;
   if(b.dataset.more){st.wordsOpen=!st.wordsOpen}else{st.word=st.word===b.dataset.w?null:b.dataset.w;st.openId=null}
   render();$('list').scrollTop=0};
@@ -428,12 +496,12 @@ function buildText(l,fmt){
   const words=st.word&&$('xWord').checked?` · palavra «${disp(st.word)}»`:'';
   let out='',last='';
   if(fmt==='md'){
-    out+=`# Diário · ${periodLabel(l)}\n\n${l.length} registos${words}\n`;
+    out+=`# Voice Journal · ${periodLabel(l)}\n\n${l.length} registos${words}\n`;
     for(const e of l){const d=new Date(e.date),k=dayKey(d);
       if(k!==last){out+=`\n## ${cap(fDay(d))}\n`;last=k}
       out+=`\n### ${fTime(d)}\n\n${e.text.trim()}\n`}
   }else{
-    out+=`DIÁRIO · ${periodLabel(l)}\n${l.length} registos${words}\n`;
+    out+=`VOICE JOURNAL · ${periodLabel(l)}\n${l.length} registos${words}\n`;
     for(const e of l){const d=new Date(e.date),k=dayKey(d);
       if(k!==last){out+=`\n\n==================================\n${cap(fDay(d)).toUpperCase()}\n==================================\n`;last=k}
       out+=`\n[${fTime(d)}]\n${e.text.trim()}\n`}
@@ -532,76 +600,94 @@ async function unlock(){const h=await DB.getK('pin');if(!h)return;
   let err='';for(;;){const p=await askPin('Introduz o PIN',false,err);if(await hashPin(p)===h)return;err='PIN errado, tenta outra vez'}}
 
 /* ---------- Gravação: carregar, falar, guardar ---------- */
-const Rec={sr:null,mr:null,stream:null,chunks:[],final:'',interim:'',on:false,t0:0,acc:0,tick:null,lock:null,mode:'',wantAudio:false,restarts:0,
+const Rec={sr:null,mr:null,stream:null,chunks:[],final:'',interim:'',on:false,t0:0,acc:0,tick:null,lock:null,mode:'',wantAudio:false,restarts:0,got:false,dog:null,lastIn:0,
   SR:window.SpeechRecognition||window.webkitSpeechRecognition,
   async start(){
-    this.final='';this.interim='';this.chunks=[];this.acc=0;this.restarts=0;
-    this.wantAudio=!!(await DB.getK('audio'));
-    this.mode=this.SR?'texto':'audio';
-    this.paint();$('rAlarm').classList.remove('show');show('sRec');
-    await this.go();
+    this.final='';this.interim='';this.chunks=[];this.acc=0;this.restarts=0;this.got=false;this.mr=null;this.lastIn=0;
+    let pref=null;try{this.wantAudio=!!(await DB.getK('audio'));pref=await DB.getK('modo')}catch{}
+    this.mode=(!this.SR||pref==='teclado')?'teclado':'texto';
+    $('rText').value='';$('rAlarm').classList.remove('show');show('sRec');
+    this.go();
   },
-  async go(){
+  go(){ // nada aqui fica à espera do telemóvel: o ecrã responde sempre
     this.on=true;$('sRec').classList.remove('paused');$('rAlarm').classList.remove('show');
     this.t0=Date.now();clearInterval(this.tick);this.tick=setInterval(()=>this.time(),500);this.time();
-    try{if(navigator.wakeLock)this.lock=await navigator.wakeLock.request('screen')}catch{}
-    if(this.mode==='texto')this.startSR();
-    if(this.mode==='audio'||this.wantAudio)await this.startMR();
-    $('rState').textContent=this.mode==='texto'?'A ouvir e a escrever…':'A gravar a voz (sem transcrição)';
+    try{navigator.wakeLock&&navigator.wakeLock.request('screen').then(l=>{this.lock=l}).catch(()=>{})}catch{}
+    if(this.mode==='texto'){
+      $('rKb').hidden=true;this.startSR();
+      clearTimeout(this.dog);this.dog=setTimeout(()=>{if(this.on&&!this.got&&this.mode==='texto')this.nudge()},8000);
+    }else this.kbShow();
+    if(this.wantAudio)this.startMR();
+    this.ui();
+  },
+  ui(){$('rState').textContent=this.mode==='texto'?'A ouvir e a escrever…':'Ditado do teclado';
+    $('rText').placeholder=this.mode==='texto'?'Começa a falar…':'O que ditares aparece aqui'},
+  nudge(){$('rKbMsg').textContent='Não está a escrever?';$('rKb').hidden=false;$('rAuto').hidden=true},
+  kbShow(){$('rKbMsg').textContent='Toca no botão e depois no 🎤 do teclado';$('rKb').hidden=false;$('rAuto').hidden=!this.SR},
+  kbMode(byUser){ // passa para o ditado do teclado do iPhone
+    clearTimeout(this.dog);const r=this.sr;this.sr=null;try{r&&r.abort()}catch{}
+    if(this.interim){this.final=(this.final+' '+this.interim).trim();this.interim='';this.paint()}
+    this.mode='teclado';if(byUser){try{DB.setK('modo','teclado')}catch{}}
+    this.ui();
   },
   startSR(){
-    const r=new this.SR();this.sr=r;r.lang='pt-PT';r.continuous=true;r.interimResults=true;
-    r.onresult=e=>{let it='';for(let i=e.resultIndex;i<e.results.length;i++){const x=e.results[i];
+    let r;try{r=new this.SR()}catch{this.kbMode(false);this.kbShow();return}
+    this.sr=r;r.lang='pt-PT';r.continuous=true;r.interimResults=true;
+    r.onresult=e=>{if(this.sr!==r)return;let it='';for(let i=e.resultIndex;i<e.results.length;i++){const x=e.results[i];
       if(x.isFinal)this.final+=(this.final&&!/\s$/.test(this.final)?' ':'')+x[0].transcript.trim();else it+=x[0].transcript}
-      this.interim=it;this.restarts=0;this.paint()};
-    r.onerror=e=>{if(['not-allowed','service-not-allowed','network','audio-capture','language-not-supported'].includes(e.error)){
-      // a transcrição não está disponível: passa a gravar a voz para não perder nada
-      this.sr=null;if(this.on){this.mode='audio';this.startMR().then(()=>{this.paint();$('rState').textContent='Sem transcrição aqui: a gravar a voz';toast('🎧 A gravar a voz em vez de escrever')})}}};
+      this.interim=it;this.restarts=0;if(!this.got){this.got=true;$('rKb').hidden=true}this.paint()};
+    r.onerror=e=>{if(this.sr!==r)return;if(['not-allowed','service-not-allowed','network','audio-capture','language-not-supported'].includes(e.error)){
+      this.kbMode(false);this.kbShow();toast('Usa o ditado do teclado')}};
     r.onend=()=>{if(this.sr!==r)return;
       if(this.interim){this.final+=(this.final?' ':'')+this.interim.trim();this.interim='';this.paint()}
       if(!this.on)return;
-      // o iPhone corta após pausas: volta a ligar sozinho
       if(document.visibilityState==='visible'&&this.restarts<25){this.restarts++;try{r.start();return}catch{}}
       this.stopped()};
-    try{r.start()}catch{this.stopped()}
+    try{r.start()}catch{this.kbMode(false);this.kbShow()}
   },
-  async startMR(){
+  startMR(){
     if(this.mr&&this.mr.state==='recording')return;
-    if(this.mr&&this.mr.state==='paused'&&this.stream&&this.stream.active){this.mr.resume();return}
-    try{this.stream=this.stream&&this.stream.active?this.stream:await navigator.mediaDevices.getUserMedia({audio:true});
-      const mr=new MediaRecorder(this.stream,{audioBitsPerSecond:32000});this.mr=mr;
-      mr.ondataavailable=e=>{if(e.data&&e.data.size)this.chunks.push(e.data)};
-      mr.onstop=()=>{if(this.on&&this.mr===mr)this.stopped()};
-      mr.start(1000);
-    }catch(err){if(this.mode==='audio'){this.on=false;show(null);toast('Sem acesso ao microfone');openEdit(null)}}
+    if(this.mr&&this.mr.state==='paused'){try{this.mr.resume()}catch{}return}
+    try{navigator.mediaDevices.getUserMedia({audio:true}).then(st=>{
+      if(!this.on){st.getTracks().forEach(t=>t.stop());return}
+      this.stream=st;const mr=new MediaRecorder(st,{audioBitsPerSecond:32000});this.mr=mr;
+      mr.ondataavailable=e=>{if(e.data&&e.data.size)this.chunks.push(e.data)};mr.start(1000)}).catch(()=>{})}catch{}
   },
-  time(){const sec=Math.floor((this.acc+(this.on?Date.now()-this.t0:0))/1000);$('rTimer').textContent=`${Math.floor(sec/60)}:${pad(sec%60)}`},
-  paint(){const L=$('rLive');
-    if(!this.final&&!this.interim){L.innerHTML=this.mode==='audio'?'<span class="ph">🎧 A gravar a voz. A transcrição não está disponível neste telemóvel.</span>':'<span class="ph">Começa a falar…</span>';return}
-    L.innerHTML=esc(this.final)+(this.interim?' <span class="int">'+esc(this.interim)+'</span>':'');L.scrollTop=L.scrollHeight},
-  halt(keep){ // para tudo; keep = só pausa a gravação de voz
-    this.acc+=this.on?Date.now()-this.t0:0;this.on=false;clearInterval(this.tick);
-    const r=this.sr;this.sr=null;try{r&&r.stop()}catch{}
+  time(){const now=Date.now(),sec=Math.floor((this.acc+(this.on?now-this.t0:0))/1000);$('rTimer').textContent=`${Math.floor(sec/60)}:${pad(sec%60)}`;
+    // ditado do teclado: se deixou de entrar texto há 30 s, avisa
+    if(this.on&&this.mode==='teclado'&&this.lastIn&&now-this.lastIn>30000){this.lastIn=0;this.alarm('Parou de escrever?','Toca aqui e depois no 🎤 do teclado');beep()}},
+  paint(){const T=$('rText');T.value=(this.final+(this.interim?' '+this.interim:'')).trim();T.scrollTop=T.scrollHeight},
+  alarm(t,sub){$('rAlarm').innerHTML=`⚠️ ${t}<br><small>${sub}</small>`;$('rAlarm').classList.add('show')},
+  halt(keep){
+    clearTimeout(this.dog);this.acc+=this.on?Date.now()-this.t0:0;this.on=false;clearInterval(this.tick);
+    const r=this.sr;this.sr=null;try{r&&r.abort()}catch{}
     try{if(this.mr&&this.mr.state==='recording'&&keep)this.mr.pause();else if(this.mr&&this.mr.state!=='inactive')this.mr.stop()}catch{}
     try{this.lock&&this.lock.release()}catch{}this.lock=null},
-  stopped(){ // parou sem o utilizador querer: avisa
-    if(!this.on)return;this.halt(true);
-    if(this.interim){this.final+=(this.final?' ':'')+this.interim.trim();this.interim='';this.paint()}
-    $('sRec').classList.add('paused');$('rAlarm').classList.add('show');$('rState').textContent='Parado';beep();
+  stopped(){ // parou sem querer: avisa
+    if(!this.on)return;
+    if(this.interim){this.final=(this.final+' '+this.interim).trim();this.interim='';this.paint()}
+    this.halt(true);$('sRec').classList.add('paused');this.alarm('A gravação parou','Toca aqui para continuar');$('rState').textContent='Parado';beep()},
+  save(){ // fecha logo e guarda; nunca fica preso
+    let text='';try{text=$('rText').value.trim()}catch{}
+    const acc=this.acc+(this.on?Date.now()-this.t0:0);const mr=this.mr;this.mr=null;
+    try{this.halt()}catch{}
+    try{mr&&mr.state!=='inactive'&&mr.stop()}catch{}
+    show(null);
+    (async()=>{
+      try{
+        await new Promise(r=>setTimeout(r,mr?600:0));
+        const blob=this.chunks.length?new Blob(this.chunks,{type:this.chunks[0].type||'audio/mp4'}):null;
+        try{this.stream&&this.stream.getTracks().forEach(t=>t.stop())}catch{}this.stream=null;
+        if(!text&&!blob){toast('Nada gravado');return}
+        const id=uid();
+        await DB.put({id,date:new Date(Date.now()-acc).toISOString(),text,audio:!!blob});
+        if(blob)await DB.req(DB.tx('a','readwrite').put(blob,id));
+        await load();toast('✔️ Registo guardado');
+      }catch(err){if(text){openEdit(null);$('eText').value=text}toast('Não guardou. O texto está aqui para guardares.')}
+    })();
   },
-  async save(){
-    this.halt();await new Promise(r=>setTimeout(r,400));this.mr=null;
-    const text=(this.final+' '+this.interim).trim();
-    const blob=this.chunks.length?new Blob(this.chunks,{type:this.chunks[0].type||'audio/mp4'}):null;
-    try{this.stream&&this.stream.getTracks().forEach(t=>t.stop())}catch{}this.stream=null;
-    if(!text&&!blob){show(null);toast('Nada gravado');return}
-    const id=uid();
-    await DB.put({id,date:new Date(Date.now()-this.acc).toISOString(),text,audio:!!blob});
-    if(blob)await DB.req(DB.tx('a','readwrite').put(blob,id));
-    show(null);await load();toast('✔️ Registo guardado');
-  },
-  cancel(){if((this.final||this.chunks.length)&&!confirm('Deitar fora esta gravação?'))return;
-    this.halt();this.mr=null;try{this.stream&&this.stream.getTracks().forEach(t=>t.stop())}catch{}this.stream=null;show(null)}
+  cancel(){if($('rText').value.trim()&&!confirm('Deitar fora este registo?'))return;
+    try{this.halt()}catch{}this.mr=null;try{this.stream&&this.stream.getTracks().forEach(t=>t.stop())}catch{}this.stream=null;show(null)}
 };
 function beep(){try{const c=new (window.AudioContext||window.webkitAudioContext)();
   [0,.35,.7].forEach(t=>{const o=c.createOscillator(),g=c.createGain();o.frequency.value=880;g.gain.value=.25;o.connect(g);g.connect(c.destination);o.start(c.currentTime+t);o.stop(c.currentTime+t+.2)});
@@ -609,7 +695,10 @@ function beep(){try{const c=new (window.AudioContext||window.webkitAudioContext)
   try{navigator.vibrate&&navigator.vibrate([300,150,300])}catch{}}
 $('rSave').onclick=()=>Rec.save();
 $('rCancel').onclick=()=>Rec.cancel();
-$('rAlarm').onclick=()=>{Rec.restarts=0;Rec.go()};
+$('rAlarm').onclick=()=>{if(Rec.on){$('rAlarm').classList.remove('show');Rec.lastIn=Date.now();$('rText').focus();return}Rec.restarts=0;Rec.go()};
+$('rAuto').onclick=()=>{try{DB.delK('modo')}catch{}Rec.mode='texto';Rec.got=false;Rec.restarts=0;Rec.halt();Rec.go()};
+$('rKbBtn').onclick=()=>{Rec.kbMode(true);$('rKb').hidden=true;$('rText').focus();Rec.lastIn=Date.now()};
+$('rText').oninput=()=>{Rec.final=$('rText').value;Rec.interim='';if(Rec.mode==='teclado')Rec.lastIn=Date.now()};
 document.addEventListener('visibilitychange',()=>{
   if(document.visibilityState==='hidden'&&Rec.on)Rec.stopped();          // bloqueou o ecrã ou mudou de app
   else if(document.visibilityState==='visible'&&$('rAlarm').classList.contains('show'))beep(); // ao voltar, lembra que parou
