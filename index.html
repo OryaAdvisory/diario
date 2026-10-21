@@ -255,7 +255,7 @@ textarea.field{height:auto;min-height:46vh;padding:10px;resize:none;line-height:
     <div class="sbig">✍️</div>
     <h3>Preparar a Transcrição</h3>
     <ul>
-      <li>📥 Para a app escrever o que dizes, precisa de descarregar o motor de transcrição <b id="setMb">uma vez só (cerca de 80 MB)</b>.</li>
+      <li>📥 Para a app escrever o que dizes, precisa de descarregar o motor de transcrição <b id="setMb">uma vez só (cerca de 100 MB)</b>.</li>
       <li>🔒 Depois funciona sempre sem internet, e o que dizes nunca sai do telemóvel.</li>
       <li>📶 Agora precisa de internet; usa Wi-Fi se puderes.</li>
       <li>⏳ Se preferires fazer mais tarde, as gravações ficam guardadas em áudio e preparas em ⚙️ Definições.</li>
@@ -307,8 +307,8 @@ textarea.field{height:auto;min-height:46vh;padding:10px;resize:none;line-height:
       <button id="mTr"><span class="i">✍️</span><span>Transcrição<span class="s" id="mTrS">A verificar…</span></span></button>
       <span class="lbl">Qualidade da Transcrição</span>
       <div class="opts" id="mQual">
-        <button class="opt" data-v="normal"><span class="i">⚡</span><span class="n">Normal</span><div class="d">Mais rápida · 80 MB</div></button>
-        <button class="opt" data-v="melhor"><span class="i">🎯</span><span class="n">Melhor</span><div class="d">Mais lenta · 250 MB</div></button>
+        <button class="opt" data-v="normal"><span class="i">⚡</span><span class="n">Normal</span><div class="d">Mais rápida · 100 MB</div></button>
+        <button class="opt" data-v="melhor"><span class="i">🎯</span><span class="n">Melhor</span><div class="d">Mais lenta · 350 MB</div></button>
       </div>
       <label class="tg"><span class="i">🎧</span><span>Guardar Também o Áudio<span class="s">Para ouvir depois; ocupa mais espaço</span></span><input type="checkbox" id="mAudio"></label>
       <button id="mPin"><span class="i">🔒</span><span id="mPinTxt">Definir PIN</span></button>
@@ -790,7 +790,7 @@ const Rec={mr:null,stream:null,segs:[],chunks:[],on:false,t0:0,acc:0,tick:null,l
 };
 
 /* ---------- Transcrição (Whisper no telemóvel) ---------- */
-const MODELS={normal:{id:'onnx-community/whisper-base',mb:80,n:'Normal'},melhor:{id:'onnx-community/whisper-small',mb:250,n:'Melhor'}};
+const MODELS={normal:{id:'onnx-community/whisper-base',mb:100,n:'Normal'},melhor:{id:'onnx-community/whisper-small',mb:350,n:'Melhor'}};
 const TR={w:null,queue:[],busy:null,p:0,dl:{},preparing:false,
   async model(){return MODELS[(await DB.getK('qual'))||'normal']},
   label(e){if(e.pending&&!TR.isReady&&TR.busy!==e.id)return`<i>🎧 Gravação de ${e.secs?(e.secs<60?e.secs+' s':Math.round(e.secs/60)+' min'):'voz'}. Prepara a transcrição em ⚙️ para ter o texto.</i>`;

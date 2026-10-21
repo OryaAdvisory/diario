@@ -4,20 +4,33 @@ env.allowLocalModels = false;
 env.useBrowserCache = true;
 env.backends.onnx.wasm.wasmPaths = new URL('./lib/', self.location).href;
 env.backends.onnx.wasm.numThreads = 1;
-let asr = null, cur = null;
+let asr = null, cur = null, dev = null;
+async function hasGPU() { // placa gráfica do telemóvel: muito mais rápido
+  try { if (self.navigator && navigator.gpu) { const ad = await navigator.gpu.requestAdapter(); return !!ad; } } catch (_) {}
+  return false;
+}
 async function load(model) {
   if (asr && cur === model) return asr;
   asr = null;
-  asr = await pipeline('automatic-speech-recognition', model, {
-    dtype: 'q8', device: 'wasm',
-    progress_callback: p => postMessage({ type: 'dl', p })
-  });
+  const progress_callback = p => postMessage({ type: 'dl', p });
+  if (await hasGPU()) {
+    try {
+      asr = await pipeline('automatic-speech-recognition', model, {
+        device: 'webgpu', dtype: { encoder_model: 'fp32', decoder_model_merged: 'q4' }, progress_callback
+      });
+      dev = 'webgpu';
+    } catch (_) { asr = null; }
+  }
+  if (!asr) {
+    asr = await pipeline('automatic-speech-recognition', model, { device: 'wasm', dtype: 'q8', progress_callback });
+    dev = 'wasm';
+  }
   cur = model;
   return asr;
 }
 self.onmessage = async e => {
   if (e.data && e.data.cmd === 'load') { // preparar na instalação, sem áudio
-    try { await load(e.data.model); postMessage({ type: 'ready', model: e.data.model }); }
+    try { await load(e.data.model); postMessage({ type: 'ready', model: e.data.model, dev }); }
     catch (err) { postMessage({ type: 'err', msg: String((err && err.message) || err) }); }
     return;
   }
