@@ -28,17 +28,44 @@ button{cursor:pointer}
 /* Topo fixo */
 .top{flex:none;padding:calc(10px + var(--safe-t)) 14px 6px;border-bottom:1px solid var(--line);background:var(--bg)}
 .bar{display:flex;align-items:center;gap:8px}
+.banner{margin:calc(-10px - var(--safe-t)) -14px 0;padding:calc(12px + var(--safe-t)) 14px 12px;background:linear-gradient(135deg,#c49a6c,#a87d52);color:#fff8ee}
+.banner .icon-btn{background:rgba(255,248,238,.18);border-color:rgba(255,248,238,.35);color:#fff8ee}
+.banner .brand .bs{color:#f6e6d0}
 .brand{flex:1;min-width:0;line-height:1.15}
 .brand .bt{font-size:20px;font-weight:700;white-space:nowrap}
 .brand .bs{font-size:11.5px;color:var(--muted);letter-spacing:.3px;margin-left:30px}
 .tabs{display:flex;gap:6px;margin-top:10px}
-.tabs button{flex:1;height:44px;border:1px solid var(--line);background:var(--card);border-radius:12px;font-size:15px;font-weight:600;color:var(--muted)}
+.tabs button{flex:1;height:44px;min-width:0;white-space:nowrap;border:1px solid var(--line);background:var(--card);border-radius:12px;font-size:15px;font-weight:600;color:var(--muted)}
 .tabs button.on{background:var(--acc-soft);border-color:var(--acc);color:var(--txt)}
-.cloud{flex:1;overflow-y:auto;padding:16px 14px calc(96px + var(--safe-b));display:flex;flex-wrap:wrap;align-content:center;justify-content:center;align-items:center;gap:4px 12px}
+.cloud{flex:1;overflow:hidden;margin:10px 14px calc(88px + var(--safe-b));padding:14px 10px;display:flex;flex-wrap:wrap;align-content:center;justify-content:center;align-items:baseline;gap:2px 12px;border-radius:22px;background:radial-gradient(ellipse at center,#fdf9f2 0%,#f8f1e5 60%,#f3eadb 100%);border:1px solid var(--line)}
+.cloud .w{letter-spacing:-.2px}
+.cloud.anim .w{animation:pop .35s ease both}
+@keyframes pop{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:none}}
 .cloud .w{border:0;background:none;padding:2px 3px;line-height:1.1;font-weight:600;border-radius:8px}
 .cloud .w:active{background:var(--acc-soft)}
-.cloud .c0{color:#9c7a4f}.cloud .c1{color:#7d8a6a}.cloud .c2{color:#a86f5b}.cloud .c3{color:#6f7f8f}.cloud .c4{color:#8a6f8f}
+.cloud .c0{color:#9c7a4f}.cloud .c1{color:#6f8a5f}.cloud .c2{color:#b0684f}.cloud .c3{color:#5f7a8f}.cloud .c4{color:#8a6a94}
 .cloud .empty{width:100%}
+.cloud .w.on{background:var(--acc);color:#fff}
+.dates{display:flex;gap:6px;margin-top:6px}
+.dates label{flex:1;display:flex;align-items:center;gap:5px;font-size:12.5px;color:var(--muted)}
+.dates input{flex:1;min-width:0;height:36px;border:1px solid var(--line);background:var(--card);border-radius:10px;padding:0 6px}
+.selbar{display:flex;align-items:center;gap:6px;margin-top:8px;background:var(--acc-soft);border:1px solid var(--acc);border-radius:12px;padding:6px 6px 6px 10px}
+.selbar span{flex:1;font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.selbar button{height:34px;border:1px solid var(--line);background:var(--card);border-radius:10px;padding:0 9px;font-size:13.5px;white-space:nowrap}
+.calv{flex:1;overflow-y:auto;padding:12px 14px calc(96px + var(--safe-b))}
+.calh{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.calh b{font-size:17px}
+.calg{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;text-align:center}
+.calg>span{font-size:12px;color:var(--muted);font-weight:600;padding-bottom:2px}
+.dd{aspect-ratio:1;border:1px solid transparent;background:none;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:15px;color:var(--muted);padding:0}
+.dd.has{background:var(--card);border-color:var(--line);color:var(--txt);font-weight:600}
+.dd.has i{width:6px;height:6px;border-radius:50%;background:var(--acc);font-style:normal;font-size:0;margin-top:3px}
+.dd.has i:not(:empty){width:auto;height:auto;background:none;font-size:10.5px;color:var(--acc);margin-top:1px}
+.dd.hit{background:var(--acc);border-color:var(--acc);color:#fff}
+.dd.hit i{background:#fff}
+.dd.hit i:not(:empty){background:none;color:#fff}
+.dd.today{border-color:var(--acc)}
+.calf{text-align:center;font-size:13px;color:var(--muted);margin-top:12px}
 .icon-btn{border:1px solid var(--line);background:var(--card);border-radius:10px;height:36px;min-width:36px;padding:0 9px;font-size:17px;display:inline-flex;align-items:center;justify-content:center;gap:5px}
 .icon-btn small{font-size:13px}
 .filters{display:flex;gap:6px;margin-top:8px}
@@ -139,27 +166,31 @@ textarea.field{height:auto;min-height:46vh;padding:10px;resize:none;line-height:
 <body>
 <div class="app">
   <div class="top">
-    <div class="bar">
+    <div class="bar banner">
       <div class="brand"><div class="bt">🎙️ Voice Journal</div><div class="bs">by Orya Advisory</div></div>
       <button class="icon-btn" id="bExport" aria-label="Exportar">📤 <small>Exportar</small></button>
       <button class="icon-btn" id="bSettings" aria-label="Definições">⚙️</button>
     </div>
-    <div class="tabs" id="tabs"><button data-v="cloud" class="on">☁️ Temas</button><button data-v="list">📖 Registos</button></div>
-    <div class="filters">
+    <div class="tabs" id="tabs"><button data-v="cloud" class="on">☁️ Temas</button><button data-v="cal">📅 Calendário</button><button data-v="list">📖 Registos</button></div>
+    <div class="filters" id="fRow">
       <select id="fPeriod" aria-label="Período">
-        <option value="all">📅 Tudo</option>
-        <option value="7">📅 7 dias</option>
-        <option value="30">📅 30 dias</option>
+        <option value="year">📅 Este ano</option>
         <option value="month">📅 Este mês</option>
         <option value="lastmonth">📅 Mês passado</option>
-        <option value="year">📅 Este ano</option>
+        <option value="30">📅 30 dias</option>
+        <option value="7">📅 7 dias</option>
+        <option value="all">📅 Tudo</option>
+        <option value="custom">📅 Escolher datas</option>
       </select>
       <input id="fSearch" type="search" placeholder="🔍 Pesquisar" autocomplete="off" hidden>
     </div>
-    <div class="words" id="words"></div>
+    <div class="dates" id="fDates" hidden><label>De <input type="date" id="fFrom"></label><label>Até <input type="date" id="fTo"></label></div>
+    <div class="words" id="selChips" hidden></div>
+    <div class="selbar" id="selBar" hidden><span id="selTxt"></span><button id="selView">📖 Ver</button><button id="selExport">📤 Exportar</button><button id="selClear" aria-label="Limpar">✕</button></div>
     <div class="info"><span id="count"></span><button id="bClear" hidden>✕ Limpar filtros</button></div>
   </div>
   <div class="cloud" id="cloud"></div>
+  <div class="calv" id="cal" hidden></div>
   <div class="list" id="list" hidden></div>
 </div>
 <button class="fab" id="bNew">🎙️ Novo Registo</button>
@@ -198,12 +229,12 @@ textarea.field{height:auto;min-height:46vh;padding:10px;resize:none;line-height:
   <div class="sb">
     <label class="lbl" for="xPeriod">Período</label>
     <select class="field" id="xPeriod">
-      <option value="all">Tudo</option>
-      <option value="7">Últimos 7 dias</option>
-      <option value="30">Últimos 30 dias</option>
+      <option value="year">Este ano</option>
       <option value="month">Este mês</option>
       <option value="lastmonth">Mês passado</option>
-      <option value="year">Este ano</option>
+      <option value="30">Últimos 30 dias</option>
+      <option value="7">Últimos 7 dias</option>
+      <option value="all">Tudo</option>
       <option value="custom">Escolher datas</option>
     </select>
     <div class="row2" id="xCustom" hidden>
@@ -271,7 +302,7 @@ const DB={db:null,
 
 /* ---------- Estado ---------- */
 let entries=[];               // {id,date(ISO),text}
-const st={period:'all',q:'',word:null,openId:null,wordsOpen:false,editId:null,fmt:'txt',view:'cloud'};
+const st={animCloud:true,period:'year',from:'',to:'',q:'',themes:new Set(),openId:null,editId:null,fmt:'txt',view:'cloud',calM:null};
 const $=id=>document.getElementById(id);
 
 /* ---------- Utilitários ---------- */
@@ -332,6 +363,7 @@ hoje ontem amanhã agora depois antes sempre nunca logo cedo tarde talvez ainda 
 gente pessoal malta mesmo mesma próprio própria certo certa claro verdade exemplo
 primeiro primeira segundo segunda terceiro último última próximo próxima outra outro outras outros
 grande grandes pequeno pequena pequenos pequenas melhor pior maior menor novo nova novos novas
+vou vai foi era tem ter ser dia ano vez fiz fez ver dar pra pro uma uns aos das dos nos nas num seu sua meu teu tua ele ela sei diz fui faz tal boa bom mal pôr até ali ora são está estou vês lhe nós vós aqui isso isto quem qual mim sem com por que mas nem ia iam via vem tão
 dois duas três quatro cinco seis sete oito nove dez cem mil milhão`).split(/\s+/));
 
 function tokens(text){return (norm(text).match(/[a-zçñ]+(?:-[a-z]+)*/g)||[])}
@@ -353,42 +385,44 @@ function range(p,from,to){
   }
 }
 function inRange(e,[a,b]){const d=new Date(e.date);return(!a||d>=a)&&(!b||d<b)}
-function hasWord(e,w){return tokens(e.text).includes(w)}
+const TOK=new WeakMap(); // texto já partido em palavras, para ser rápido
+function tline(e){let t=TOK.get(e);if(!t||t.src!==e.text){t={src:e.text,v:' '+tokens(e.text).join(' ')+' '};TOK.set(e,t)}return t.v}
+function hasTheme(e,k){return tline(e).includes(' '+k+' ')}
+function hasAny(e,set){if(!set.size)return true;for(const k of set)if(hasTheme(e,k))return true;return false}
 function matchQ(e,q){if(!q)return true;const t=norm(e.text);return norm(q).split(/\s+/).filter(Boolean).every(x=>t.includes(x))}
-function baseFiltered(){const r=range(st.period);return entries.filter(e=>inRange(e,r)&&matchQ(e,st.q))}
+function baseFiltered(){const r=range(st.period,st.from,st.to);return entries.filter(e=>inRange(e,r)&&matchQ(e,st.q))}
+function themed(base){return base.filter(e=>hasAny(e,st.themes))}
+const ok=w=>w.length>=3&&!STOP.has(w);
+const LINK=new Set(['de','do','da','dos','das','e']);
+const dispK=k=>k.split(' ').map(disp).join(' ');
+
+/* Temas: palavras soltas e expressões que se repetem («web summit», «gestão de stock») */
+function topThemes(base,n){
+  const wf=new Map(),pf=new Map();
+  for(const e of base){const sw=new Set(),sp=new Set();
+    for(const seg of e.text.split(/[.,;:!?\n()«»"“”—–-]+/)){ // expressões nunca atravessam pontuação
+      const t=tokens(seg);
+      for(let i=0;i<t.length;i++){const a=t[i];if(!ok(a))continue;
+        if(!sw.has(a)){sw.add(a);wf.set(a,(wf.get(a)||0)+1)}
+        const b=t[i+1];
+        if(b&&ok(b)){const k=a+' '+b;if(!sp.has(k)){sp.add(k);pf.set(k,(pf.get(k)||0)+1)}}
+        else if(b&&LINK.has(b)&&t[i+2]&&ok(t[i+2])){const k=a+' '+b+' '+t[i+2];if(!sp.has(k)){sp.add(k);pf.set(k,(pf.get(k)||0)+1)}}
+      }}}
+  const phrases=[...pf].filter(([,c])=>c>=3);
+  const out=[...phrases];
+  for(const [w,c] of wf){
+    // a palavra solta sai se quase sempre aparece dentro de uma expressão já mostrada
+    if(phrases.some(([k,pc])=>k.split(' ').includes(w)&&pc>=c*.7))continue;
+    out.push([w,c]);
+  }
+  return out.sort((a,b)=>b[1]-a[1]||b[0].split(' ').length-a[0].split(' ').length||a[0].localeCompare(b[0])).slice(0,n);
+}
 
 /* ---------- Desenho ---------- */
-function renderWords(base){
-  const freq=new Map(),shown=new Map();
-  for(const e of base){
-    const seen=new Set();
-    for(const w of tokens(e.text)){
-      if(w.length<4||STOP.has(w)||seen.has(w))continue;seen.add(w);   // conta em quantos registos aparece
-      freq.set(w,(freq.get(w)||0)+1);
-    }
-  }
-  let top=[...freq].filter(([,n])=>n>=2||base.length<3).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])).slice(0,30);
-  if(st.word&&!top.find(([w])=>w===st.word))top.unshift([st.word,freq.get(st.word)||0]);
-  const box=$('words');
-  if(!top.length){box.innerHTML='';box.hidden=true;return}
-  box.hidden=st.view!=='list';
-  const max=top[0][1]||1;
-  box.innerHTML=top.map(([w,n])=>{const l=n>=max*.66?'l3':n>=max*.33?'l2':'';return`<button class="chip ${l}${st.word===w?' on':''}" data-w="${esc(w)}">${esc(disp(w))}<b>${n}</b></button>`}).join('');
-  box.classList.toggle('open',st.wordsOpen);
-  // botão "mais" quando não cabe
-  requestAnimationFrame(()=>{
-    if(!st.wordsOpen&&box.scrollHeight>box.clientHeight+2){
-      const m=document.createElement('button');m.className='chip more';m.textContent='＋ mais';m.dataset.more='1';
-      box.appendChild(m);
-      while(box.scrollHeight>box.clientHeight+2&&m.previousElementSibling&&!m.previousElementSibling.classList.contains('on'))m.previousElementSibling.remove();
-    }else if(st.wordsOpen){const m=document.createElement('button');m.className='chip more';m.textContent='－ menos';m.dataset.more='1';box.appendChild(m)}
-  });
-}
 function hl(text){
   let h=esc(text);
-  const terms=[];if(st.word)terms.push(st.word);if(st.q)terms.push(...norm(st.q).split(/\s+/).filter(x=>x.length>1));
+  const terms=[...st.themes];if(st.q)terms.push(...norm(st.q).split(/\s+/).filter(x=>x.length>1));
   if(!terms.length)return h;
-  // marcar ignorando acentos: percorre o texto normalizado em paralelo
   const n=norm(h);const marks=[];
   for(const t of terms){let i=0;while((i=n.indexOf(t,i))>-1){marks.push([i,i+t.length]);i+=t.length}}
   if(!marks.length)return h;
@@ -396,34 +430,65 @@ function hl(text){
   for(const[a,b]of marks){if(a<p)continue;out+=h.slice(p,a)+'<mark>'+h.slice(a,b)+'</mark>';p=b}
   return out+h.slice(p);
 }
-function topWords(base,n){
-  const freq=new Map();
-  for(const e of base){const seen=new Set();
-    for(const w of tokens(e.text)){if(w.length<4||STOP.has(w)||seen.has(w))continue;seen.add(w);freq.set(w,(freq.get(w)||0)+1)}}
-  return [...freq].sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])).slice(0,n);
-}
 function renderCloud(base){
   const C=$('cloud');
-  const top=topWords(base,45).filter(([,n])=>n>=2||base.length<4);
-  if(!top.length){C.innerHTML=`<div class="empty"><div class="big">☁️</div><p>${entries.length?'Ainda não há palavras repetidas neste período.':'As palavras de que mais falas aparecem aqui.<br>Carrega em <b>Novo Registo</b> para começar.'}</p></div>`;return}
-  const max=top[0][1],min=top[top.length-1][1];
-  // as maiores ao centro, as outras alternadas para os lados
-  const arr=[];top.forEach((x,i)=>i%2?arr.push(x):arr.unshift(x));
-  C.innerHTML=arr.map(([w,n])=>{const f=max===min?1:(n-min)/(max-min);const size=Math.round(15+f*27);
-    return`<button class="w c${w.length%5}" style="font-size:${size}px" data-w="${esc(w)}" title="${n} registos">${esc(disp(w))}</button>`}).join('');
+  let top=topThemes(base,45).filter(([,c])=>c>=2||base.length<4);
+  for(const k of st.themes)if(!top.find(([x])=>x===k))top.push([k,base.filter(e=>hasTheme(e,k)).length]);
+  if(!top.length){C.innerHTML=`<div class="empty"><div class="big">☁️</div><p>${entries.length?'Ainda não há temas repetidos neste período.':'Os temas de que mais falas aparecem aqui.<br>Carrega em <b>Novo Registo</b> para começar.'}</p></div>`;return}
+  const cs=top.map(x=>x[1]),max=Math.max(...cs),min=Math.min(...cs);
+  const arr=[];top.forEach((x,i)=>i%2?arr.push(x):arr.unshift(x)); // as maiores ao centro
+  C.innerHTML=arr.map(([k,c],i)=>{const f=max===min?1:(c-min)/(max-min);const size=Math.round(14+f*30),wt=f>.6?800:f>.25?650:500;
+    return`<button class="w c${k.length%5}${st.themes.has(k)?' on':''}" style="font-size:${size}px;font-weight:${wt};animation-delay:${Math.min(i*18,400)}ms" data-k="${esc(k)}" data-f="${f}">${esc(dispK(k))}</button>`}).join('');
+  C.classList.toggle('anim',!!st.animCloud);st.animCloud=false;
+  fitCloud();
 }
-function setView(v){st.view=v;document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
-  $('cloud').hidden=v!=='cloud';$('list').hidden=v!=='list';$('fSearch').hidden=v!=='list';render()}
+function fitCloud(){ // a nuvem cabe sempre no ecrã: tira as mais pequenas até caber
+  const C=$('cloud');if(C.hidden)return;
+  const over=()=>C.scrollHeight>C.clientHeight+1;
+  let guard=60;
+  while(over()&&guard--){
+    const ws=[...C.querySelectorAll('.w:not(.on)')];if(!ws.length)break;
+    ws.reduce((a,b)=>+b.dataset.f<+a.dataset.f?b:a).remove();
+  }
+}
+addEventListener('resize',()=>{if(st.view==='cloud')render()});
+function renderSel(base){
+  const n=st.themes.size,bar=$('selBar');
+  $('selChips').innerHTML=[...st.themes].map(k=>`<button class="chip on" data-k="${esc(k)}">${esc(dispK(k))} ✕</button>`).join('');
+  bar.hidden=!n||st.view==='list';$('selChips').hidden=!n||st.view!=='list';
+  if(n){const c=themed(base).length;$('selTxt').textContent=`🏷️ ${n} ${n===1?'tema':'temas'}`;$('selView').textContent=`📖 Ver ${c}`}
+}
+const MES=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+function renderCal(){
+  const C=$('cal');if(st.view!=='cal')return;
+  const m=st.calM||(st.calM=new Date(new Date().getFullYear(),new Date().getMonth(),1));
+  const y=m.getFullYear(),mo=m.getMonth(),days=new Date(y,mo+1,0).getDate(),first=(new Date(y,mo,1).getDay()+6)%7;
+  const count=new Map(),hit=new Set();
+  for(const e of entries){const d=new Date(e.date);if(d.getFullYear()!==y||d.getMonth()!==mo)continue;const k=d.getDate();
+    count.set(k,(count.get(k)||0)+1);if(st.themes.size&&hasAny(e,st.themes))hit.add(k)}
+  const today=new Date();let cells='';
+  for(let i=0;i<first;i++)cells+='<div></div>';
+  for(let d=1;d<=days;d++){const c=count.get(d)||0,isT=today.getFullYear()===y&&today.getMonth()===mo&&today.getDate()===d;
+    cells+=`<button class="dd${c?' has':''}${hit.has(d)?' hit':''}${isT?' today':''}" data-d="${d}" ${c?'':'disabled'}><span>${d}</span>${c?`<i>${c>1?c:''}</i>`:''}</button>`}
+  const tot=[...count.values()].reduce((a,b)=>a+b,0);
+  C.innerHTML=`<div class="calh"><button class="icon-btn" data-m="-1">‹</button><b>${MES[mo]} ${y}</b><button class="icon-btn" data-m="1">›</button></div>
+    <div class="calg"><span>S</span><span>T</span><span>Q</span><span>Q</span><span>S</span><span>S</span><span>D</span>${cells}</div>
+    <p class="calf">${tot?`${tot} ${tot===1?'registo':'registos'} em ${count.size} ${count.size===1?'dia':'dias'}`:'Sem registos neste mês'}${st.themes.size?' · realçados os dias com os temas escolhidos':''}</p>`;
+}
+function setView(v){if(v==='cloud'&&st.view!=='cloud')st.animCloud=true;st.view=v;document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
+  $('cloud').hidden=v!=='cloud';$('list').hidden=v!=='list';$('cal').hidden=v!=='cal';
+  $('fSearch').hidden=v!=='list';$('fRow').hidden=v==='cal';render()}
 function render(){
+  $('fDates').hidden=st.period!=='custom'||st.view==='cal';
   const base=baseFiltered();
-  renderCloud(base);
-  renderWords(base);
-  $('words').hidden=st.view!=='list'||!$('words').innerHTML;
-  const list=st.word?base.filter(e=>hasWord(e,st.word)):base;
+  if(st.view==='cloud')renderCloud(base);
+  renderSel(base);renderCal();
+  const list=themed(base);
   const L=$('list');
-  const filt=st.period!=='all'||st.q||st.word;
-  $('bClear').hidden=!filt;
-  $('count').textContent=entries.length?`${list.length} ${list.length===1?'registo':'registos'}${filt?' de '+entries.length:''}`:'';
+  const filt=st.period!=='year'||st.q||(st.themes.size&&st.view==='list');
+  $('bClear').hidden=!filt||st.view==='cal';
+  $('count').textContent=st.view==='cal'?'':entries.length?`${(st.view==='list'?list:base).length} ${(st.view==='list'?list:base).length===1?'registo':'registos'}${filt?' de '+entries.length:''}`:'';
+  if(st.view!=='list')return;
   if(!entries.length){L.innerHTML=`<div class="empty"><div class="big">🎙️</div><p>Ainda não há registos.<br>Carrega em <b>Novo Registo</b> para começar.</p></div>`;return}
   if(!list.length){L.innerHTML=`<div class="empty"><div class="big">🔍</div><p>Nenhum registo com estes filtros.</p></div>`;return}
   let html='',last='';
@@ -441,15 +506,24 @@ function render(){
 }
 async function load(){entries=(await DB.all()).sort((a,b)=>b.date.localeCompare(a.date));DISP.clear();entries.forEach(e=>learn(e.text));render()}
 
-/* ---------- Eventos da lista ---------- */
-$('fPeriod').onchange=e=>{st.period=e.target.value;render()};
+/* ---------- Eventos ---------- */
+$('fPeriod').onchange=e=>{st.period=e.target.value;
+  if(st.period==='custom'&&!st.from){const t=new Date();st.from=dayKey(new Date(t.getFullYear(),0,1));st.to=dayKey(t);$('fFrom').value=st.from;$('fTo').value=st.to}
+  render()};
+$('fFrom').onchange=e=>{st.from=e.target.value;render()};
+$('fTo').onchange=e=>{st.to=e.target.value;render()};
 $('fSearch').oninput=e=>{st.q=e.target.value.trim();render()};
-$('bClear').onclick=()=>{st.period='all';st.q='';st.word=null;$('fPeriod').value='all';$('fSearch').value='';render()};
+$('bClear').onclick=()=>{st.period='year';st.q='';st.themes.clear();$('fPeriod').value='year';$('fSearch').value='';render()};
 $('tabs').onclick=e=>{const b=e.target.closest('button');if(b)setView(b.dataset.v)};
-$('cloud').onclick=e=>{const b=e.target.closest('.w');if(!b)return;st.word=b.dataset.w;st.openId=null;setView('list');$('list').scrollTop=0};
-$('words').onclick=e=>{const b=e.target.closest('button');if(!b)return;
-  if(b.dataset.more){st.wordsOpen=!st.wordsOpen}else{st.word=st.word===b.dataset.w?null:b.dataset.w;st.openId=null}
-  render();$('list').scrollTop=0};
+$('cloud').onclick=e=>{const b=e.target.closest('.w');if(!b)return;const k=b.dataset.k;st.themes.has(k)?st.themes.delete(k):st.themes.add(k);st.openId=null;render()};
+$('selChips').onclick=e=>{const b=e.target.closest('button');if(!b)return;st.themes.delete(b.dataset.k);render()};
+$('selView').onclick=()=>{setView('list');$('list').scrollTop=0};
+$('selExport').onclick=()=>$('bExport').click();
+$('selClear').onclick=()=>{st.themes.clear();render()};
+$('cal').onclick=e=>{const m=e.target.closest('[data-m]');if(m){const c=st.calM;st.calM=new Date(c.getFullYear(),c.getMonth()+ +m.dataset.m,1);render();return}
+  const d=e.target.closest('.dd.has');if(!d)return;const c=st.calM,k=dayKey(new Date(c.getFullYear(),c.getMonth(),+d.dataset.d));
+  if(!d.classList.contains('hit'))st.themes.clear(); // dia sem os temas escolhidos: mostra tudo desse dia
+  st.period='custom';st.from=st.to=k;$('fPeriod').value='custom';$('fFrom').value=$('fTo').value=k;setView('list');$('list').scrollTop=0};
 $('list').onclick=async e=>{
   const card=e.target.closest('.entry');if(!card)return;const id=card.dataset.id;
   const a=e.target.closest('[data-a]');
@@ -487,13 +561,13 @@ $('eSave').onclick=async()=>{
 function exportList(){
   const p=$('xPeriod').value,r=range(p,$('xFrom').value,$('xTo').value);
   let l=entries.filter(e=>inRange(e,r));
-  if(st.word&&$('xWord').checked)l=l.filter(e=>hasWord(e,st.word));
+  if(st.themes.size&&$('xWord').checked)l=l.filter(e=>hasAny(e,st.themes));
   return l.slice().reverse(); // do mais antigo para o mais recente: lê-se como um diário
 }
 function periodLabel(l){if(!l.length)return'';const a=new Date(l[0].date),b=new Date(l[l.length-1].date);return fShort(a)===fShort(b)?fShort(a):`${fShort(a)} a ${fShort(b)}`}
 function buildText(l,fmt){
   const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
-  const words=st.word&&$('xWord').checked?` · palavra «${disp(st.word)}»`:'';
+  const words=st.themes.size&&$('xWord').checked?` · temas: ${[...st.themes].map(dispK).join(', ')}`:'';
   let out='',last='';
   if(fmt==='md'){
     out+=`# Voice Journal · ${periodLabel(l)}\n\n${l.length} registos${words}\n`;
@@ -516,11 +590,11 @@ function updSum(){
   $('xGo').disabled=$('xCopy').disabled=!l.length;
 }
 $('bExport').onclick=()=>{
-  $('xPeriod').value=['all','7','30','month','lastmonth','year'].includes(st.period)?st.period:'all';
-  $('xWordRow').hidden=!st.word;$('xWord').checked=!!st.word;
-  if(st.word)$('xWordTxt').innerHTML=`Só os registos com a palavra <b>«${esc(disp(st.word))}»</b>`;
-  const t=new Date();if(!$('xTo').value)$('xTo').value=dayKey(t);
-  if(!$('xFrom').value)$('xFrom').value=dayKey(new Date(t.getFullYear(),t.getMonth(),1));
+  $('xPeriod').value=st.period;
+  $('xWordRow').hidden=!st.themes.size;$('xWord').checked=!!st.themes.size;
+  if(st.themes.size)$('xWordTxt').innerHTML=`Só os registos dos temas <b>${[...st.themes].map(k=>'«'+esc(dispK(k))+'»').join(', ')}</b>`;
+  const t=new Date();$('xFrom').value=st.period==='custom'&&st.from?st.from:dayKey(new Date(t.getFullYear(),0,1));
+  $('xTo').value=st.period==='custom'&&st.to?st.to:dayKey(t);
   updSum();show('sExport');
 };
 ['xPeriod','xFrom','xTo','xWord'].forEach(i=>$(i).onchange=updSum);
