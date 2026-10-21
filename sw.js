@@ -1,5 +1,5 @@
 // Guarda a app no telemóvel para funcionar sem internet. Os registos nunca passam por aqui.
-const C='diario-v9';
+const C='diario-v10';
 const FILES=['./','index.html','manifest.webmanifest','icon-192.png','icon-512.png','apple-touch-icon.png','whisper-worker.js','lib/transformers.min.js','lib/ort-wasm-simd-threaded.jsep.mjs','lib/ort-wasm-simd-threaded.jsep.wasm'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(FILES.map(f=>new Request(f,{cache:'reload'})))).then(()=>self.skipWaiting()))});
 // o motor de transcrição (transformers-cache) nunca é apagado
@@ -11,6 +11,8 @@ self.addEventListener('fetch',e=>{
     e.respondWith(caches.match(r,{ignoreSearch:true}).then(x=>x||fetch(r)));return;
   }
   // resto: tenta a versão nova; sem internet usa a guardada
-  e.respondWith(fetch(r,{cache:'no-cache'}).then(res=>{if(res.ok){const cp=res.clone();caches.open(C).then(c=>c.put(r.mode==='navigate'?'index.html':r,cp))}return res})
-    .catch(()=>caches.match(r.mode==='navigate'?'index.html':r,{ignoreSearch:true})));
+  // o Safari não aceita reenviar um pedido de navegação com opções: pede pelo endereço
+  const nav=r.mode==='navigate',key=nav?'index.html':r;
+  e.respondWith(fetch(nav?u.href:r.url,{cache:'no-cache',credentials:'same-origin'}).then(res=>{if(res.ok&&res.type==='basic'){const cp=res.clone();caches.open(C).then(c=>c.put(key,cp))}return res})
+    .catch(()=>caches.match(key,{ignoreSearch:true}).then(x=>x||caches.match('./'))));
 });

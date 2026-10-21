@@ -9,11 +9,11 @@ async function hasGPU() { // placa gráfica do telemóvel: muito mais rápido
   try { if (self.navigator && navigator.gpu) { const ad = await navigator.gpu.requestAdapter(); return !!ad; } } catch (_) {}
   return false;
 }
-async function load(model) {
+async function load(model, nogpu) {
   if (asr && cur === model) return asr;
   asr = null;
   const progress_callback = p => postMessage({ type: 'dl', p });
-  if (await hasGPU()) {
+  if (!nogpu && await hasGPU()) {
     try {
       asr = await pipeline('automatic-speech-recognition', model, {
         device: 'webgpu', dtype: { encoder_model: 'fp32', decoder_model_merged: 'q4' }, progress_callback
@@ -30,14 +30,14 @@ async function load(model) {
 }
 self.onmessage = async e => {
   if (e.data && e.data.cmd === 'load') { // preparar na instalação, sem áudio
-    try { await load(e.data.model); postMessage({ type: 'ready', model: e.data.model, dev }); }
+    try { await load(e.data.model, e.data.nogpu); postMessage({ type: 'ready', model: e.data.model, dev }); }
     catch (err) { postMessage({ type: 'err', msg: String((err && err.message) || err) }); }
     return;
   }
-  const { id, audio, model, lang } = e.data;
+  const { id, audio, model, lang, nogpu } = e.data;
   try {
-    const a = await load(model);
-    postMessage({ type: 'ready', id, model });
+    const a = await load(model, nogpu);
+    postMessage({ type: 'ready', id, model, dev });
     const total = Math.max(1, Math.ceil(audio.length / 16000 / 20));
     let done = 0, streamer = null;
     try {

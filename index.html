@@ -147,6 +147,30 @@ textarea.field{height:auto;min-height:46vh;padding:10px;resize:none;line-height:
 .menu .opts .opt{display:block;height:auto;text-align:center;padding:10px 6px;gap:0}
 .menu .opts .opt .i{display:block;width:auto;font-size:24px}
 .menu .opts .opt.on{border-color:var(--acc);background:var(--acc-soft)}
+.modal{position:fixed;inset:0;z-index:20;background:rgba(74,66,56,.35);display:none;align-items:center;justify-content:center;padding:18px}
+.modal.show{display:flex}
+.mcard{width:100%;max-width:420px;background:var(--bg);border-radius:22px;box-shadow:0 18px 50px rgba(60,45,25,.3);overflow:hidden;display:flex;flex-direction:column;max-height:92vh}
+.mhead{background:linear-gradient(135deg,#c49a6c,#a87d52);color:#fff8ee;font-weight:700;font-size:17px;padding:14px 18px;white-space:nowrap}
+.steps{display:flex;align-items:center;padding:16px 22px 4px}
+.steps i{flex:1;height:2px;background:var(--line);margin:0 6px 18px}
+.stp{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:56px}
+.stp b{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--card);border:2px solid var(--line);color:var(--muted);font-size:14px}
+.stp span{font-size:12px;color:var(--muted);white-space:nowrap}
+.stp.on b{background:var(--acc);border-color:var(--acc);color:#fff}.stp.on span{color:var(--txt);font-weight:600}
+.stp.ok b{background:var(--acc-soft);border-color:var(--acc);color:var(--acc)}
+.mbody{padding:10px 20px 6px;overflow-y:auto;text-align:center}
+.mbody h3{margin:6px 0 12px;font-size:19px;white-space:nowrap}
+.mbody ul,.mbody ol.howto{list-style:none;padding:0;margin:0;text-align:left;display:flex;flex-direction:column;gap:8px}
+.mbody li{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:9px 12px;font-size:14.5px}
+.mbody .sbig{font-size:46px}
+.msub{font-size:14px;color:var(--muted);margin:10px 0 0}
+.merr{background:#f6e2dc;color:#8a4a3a;border-radius:10px;padding:8px 10px;font-size:13.5px;margin:10px 0 0}
+.mfoot{display:flex;gap:8px;padding:14px 18px 18px}
+.mfoot .btn{height:50px}
+.guide{width:100%;max-width:320px;text-align:left}
+.guide h4{margin:0 0 10px;font-size:17px;text-align:center;color:var(--txt)}
+.guide div{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:8px;font-size:14.5px;color:var(--txt)}
+.guide div b{width:26px;height:26px;border-radius:50%;background:var(--acc);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;flex:none}
 .setup{text-align:center}
 .setup .sbig{font-size:54px;margin-top:10px}
 .setup h3{margin:6px 0 12px;font-size:21px}
@@ -248,22 +272,34 @@ textarea.field{height:auto;min-height:46vh;padding:10px;resize:none;line-height:
   </div>
 </div>
 
-<!-- Preparar a transcrição (primeira vez) -->
-<div class="sheet" id="sSetup">
-  <div class="sh"><h2>🎙️ Voice Journal</h2></div>
-  <div class="sb setup">
-    <div class="sbig">✍️</div>
-    <h3>Preparar a Transcrição</h3>
+<!-- Instalação inicial (janela com passos) -->
+<div class="modal" id="sSetup"><div class="mcard">
+  <div class="mhead">⚙️ Instalação Inicial</div>
+  <div class="steps"><div class="stp" data-s="1"><b>1</b><span>Porquê</span></div><i></i><div class="stp" data-s="2"><b>2</b><span>Instalar</span></div><i></i><div class="stp" data-s="3"><b>3</b><span>Pronto</span></div></div>
+  <div class="mbody" id="mStep1">
+    <h3>✍️ Transcrição no Telemóvel</h3>
     <ul>
-      <li>📥 Para a app escrever o que dizes, precisa de descarregar o motor de transcrição <b id="setMb">uma vez só (cerca de 100 MB)</b>.</li>
-      <li>🔒 Depois funciona sempre sem internet, e o que dizes nunca sai do telemóvel.</li>
+      <li>📥 Para escrever o que dizes, a app instala o motor de transcrição <b id="setMb">uma vez só (cerca de 100 MB)</b>.</li>
+      <li>🔒 Depois funciona sem internet e o que dizes nunca sai do telemóvel.</li>
       <li>📶 Agora precisa de internet; usa Wi-Fi se puderes.</li>
-      <li>⏳ Se preferires fazer mais tarde, as gravações ficam guardadas em áudio e preparas em ⚙️ Definições.</li>
     </ul>
-    <div class="setprog" id="setProg" hidden><div class="pb"><i id="setBar"></i></div><span id="setTxt"></span></div>
+    <p class="merr" id="setErr" hidden></p>
   </div>
-  <div class="sf"><button class="btn" id="setLater">Mais Tarde</button><button class="btn pri" id="setGo">⬇️ Preparar Agora</button></div>
-</div>
+  <div class="mbody" id="mStep2" hidden>
+    <div class="sbig">⬇️</div><h3>A Instalar</h3>
+    <div class="pb"><i id="setBar"></i></div><p class="msub" id="setTxt">A ligar…</p>
+    <p class="msub">Mantém a app aberta até terminar.</p>
+  </div>
+  <div class="mbody" id="mStep3" hidden>
+    <div class="sbig">✅</div><h3>Está Tudo Pronto</h3>
+    <ol class="howto"><li>🎙️ Grava o teu primeiro registo</li><li>✍️ A app escreve o que disseste</li><li>☁️ Os temas aparecem sozinhos</li></ol>
+  </div>
+  <div class="mbody" id="mLater" hidden>
+    <div class="sbig">🕓</div><h3>Fica Para Depois</h3>
+    <p class="msub">Quando quiseres, vai a <b>⚙️ Definições → Transcrição</b>, com internet. Até lá, as gravações ficam guardadas em áudio e são transcritas a seguir.</p>
+  </div>
+  <div class="mfoot" id="mFoot"></div>
+</div></div>
 
 <!-- Exportar -->
 <div class="sheet" id="sExport">
@@ -482,7 +518,8 @@ function renderCloud(base){
   const C=$('cloud');
   let top=topThemes(base,45).filter(([,c])=>c>=2||base.length<4);
   for(const k of st.themes)if(!top.find(([x])=>x===k))top.push([k,base.filter(e=>hasTheme(e,k)).length]);
-  if(!top.length){C.innerHTML=`<div class="empty"><div class="big">☁️</div><p>${entries.length?'Ainda não há temas repetidos neste período.':'Os temas de que mais falas aparecem aqui.<br>Carrega em <b>Novo Registo</b> para começar.'}</p></div>`;return}
+  if(!top.length){C.innerHTML=`<div class="empty"><div class="big">☁️</div><p>${entries.length?'Ainda não há temas repetidos neste período.':'Os temas de que mais falas aparecem aqui.'}</p></div>`;
+    if(!entries.length)C.innerHTML=`<div class="guide"><h4>Para Começar</h4><div><b>1</b>🎙️ Grava o teu primeiro registo</div><div><b>2</b>✍️ A app escreve o que disseste</div><div><b>3</b>☁️ Os temas aparecem aqui</div></div>`;return}
   const cs=top.map(x=>x[1]),max=Math.max(...cs),min=Math.min(...cs);
   const arr=[];top.forEach((x,i)=>i%2?arr.push(x):arr.unshift(x)); // as maiores ao centro
   C.innerHTML=arr.map(([k,c],i)=>{const f=max===min?1:(c-min)/(max-min);const size=Math.round(14+f*30),wt=f>.6?800:f>.25?650:500;
@@ -793,19 +830,38 @@ const Rec={mr:null,stream:null,segs:[],chunks:[],on:false,t0:0,acc:0,tick:null,l
 const MODELS={normal:{id:'onnx-community/whisper-base',mb:100,n:'Normal'},melhor:{id:'onnx-community/whisper-small',mb:350,n:'Melhor'}};
 const TR={w:null,queue:[],busy:null,p:0,dl:{},preparing:false,
   async model(){return MODELS[(await DB.getK('qual'))||'normal']},
-  label(e){if(e.pending&&!TR.isReady&&TR.busy!==e.id)return`<i>🎧 Gravação de ${e.secs?(e.secs<60?e.secs+' s':Math.round(e.secs/60)+' min'):'voz'}. Prepara a transcrição em ⚙️ para ter o texto.</i>`;
-    if(TR.busy===e.id)return`<span class="trst">⏳ A escrever o que disseste… ${Math.round(TR.p*100)}%</span>`;
+  label(e){if(TR.busy===e.id)return`<span class="trst">⏳ A escrever o que disseste… ${Math.round(TR.p*100)}%</span>`;
     return e.pending?`<i>🎧 Gravação de ${e.secs?(e.secs<60?e.secs+' s':Math.round(e.secs/60)+' min'):'voz'}, ainda sem texto.</i>`:'<i>Sem transcrição. Toca para ouvir.</i>'},
   worker(){if(!this.w){this.w=new Worker('whisper-worker.js',{type:'module'});this.w.onmessage=e=>this.msg(e.data);
-      this.w.onerror=e=>{this.fail('O motor de transcrição não arrancou neste telemóvel.')}}return this.w},
+      this.w.onerror=e=>{if(this.preparing){this.preparing=false;DB.setK('nogpu',true);this.step(1,'O motor não arrancou. Vou tentar o modo normal.');try{this.w.terminate()}catch{}this.w=null;return}
+        this.fail('O motor de transcrição não arrancou neste telemóvel.')}}return this.w},
   async ready(){const m=await this.model();this.isReady=!!(await DB.getK('ready:'+m.id));return this.isReady},
   async status(){const m=await this.model(),ok=await this.ready();
     $('mTrS').textContent=ok?`✔️ Pronta · ${m.n}`:`Por preparar · toca para preparar (${m.mb} MB, com internet)`},
-  async openSetup(){const m=await this.model();$('setMb').textContent=`uma vez só (cerca de ${m.mb} MB)`;
-    $('setProg').hidden=true;$('setGo').disabled=false;$('setGo').textContent='⬇️ Preparar Agora';show('sSetup')},
+  step(n,err){ // 1 porquê · 2 instalar · 3 pronto · 'later'
+    ['mStep1','mStep2','mStep3','mLater'].forEach(x=>$(x).hidden=true);
+    $(n==='later'?'mLater':'mStep'+n).hidden=false;
+    document.querySelectorAll('.stp').forEach(p=>{const k=+p.dataset.s;p.classList.toggle('on',k===n||(n==='later'&&k===1));p.classList.toggle('ok',typeof n==='number'&&k<n)});
+    $('setErr').hidden=!err;if(err)$('setErr').textContent=err;
+    const F=$('mFoot');
+    if(n===1)F.innerHTML=`<button class="btn" id="mLaterB">Mais Tarde</button><button class="btn pri" id="mGo">${err?'🔄 Tentar Outra Vez':'⬇️ Instalar Agora'}</button>`;
+    if(n===2)F.innerHTML=`<button class="btn" disabled>⏳ A instalar…</button>`;
+    if(n===3)F.innerHTML=`<button class="btn" id="mClose">Fechar</button><button class="btn pri" id="mFirst">🎙️ Gravar</button>`;
+    if(n==='later')F.innerHTML=`<button class="btn pri" id="mClose">Entendido</button>`;
+    const on=(id,f)=>{const b=document.getElementById(id);if(b)b.onclick=f};
+    on('mGo',()=>this.prepare());
+    on('mLaterB',async()=>{await DB.setK('setupSeen',true);this.step('later')});
+    on('mClose',()=>this.closeSetup());
+    on('mFirst',()=>{this.closeSetup();Rec.start()});
+  },
+  closeSetup(){$('sSetup').classList.remove('show')},
+  async openSetup(err){const m=await this.model();$('setMb').textContent=`uma vez só (cerca de ${m.mb} MB)`;this.step(1,err);$('sSetup').classList.add('show')},
+  async gpuFlag(){ // se a última tentativa com a placa gráfica fez a app ir abaixo, usa o modo normal
+    return !!(await DB.getK('nogpu'))},
   async prepare(){const m=await this.model();this.preparing=true;this.dl={};
-    $('setProg').hidden=false;$('setBar').style.width='2%';$('setTxt').textContent='A ligar…';$('setGo').disabled=true;$('setGo').textContent='A preparar…';
-    this.worker().postMessage({cmd:'load',model:m.id})},
+    this.step(2);$('setBar').style.width='2%';$('setTxt').textContent='A ligar…';
+    const nogpu=await this.gpuFlag();if(!nogpu)await DB.setK('gpuTry',true);
+    this.worker().postMessage({cmd:'load',model:m.id,nogpu})},
   async request(id,user){
     if(!(await this.ready())){if(user)this.openSetup();return}
     if(!this.queue.includes(id)&&this.busy!==id)this.queue.push(id);this.next();
@@ -815,44 +871,47 @@ const TR={w:null,queue:[],busy:null,p:0,dl:{},preparing:false,
     try{const b=await DB.req(DB.tx('a','readonly').get(id));const segs=Array.isArray(b)?b:(b?[b]:[]);
       if(!segs.length)throw new Error('sem áudio');
       const pcm=await toPCM(segs);const m=await this.model();
-      this.worker().postMessage({id,audio:pcm,model:m.id,lang:'portuguese'},[pcm.buffer]);
+      const nogpu=await this.gpuFlag();if(!nogpu)await DB.setK('gpuTry',true);
+      this.worker().postMessage({id,audio:pcm,model:m.id,lang:'portuguese',nogpu},[pcm.buffer]);
     }catch(err){this.fail('Não consegui ler esta gravação.')}},
   async msg(d){
     if(d.type==='dl'){const p=d.p;if(p.status==='progress'&&p.file){this.dl[p.file]=[p.loaded||0,p.total||0]}
       const v=Object.values(this.dl),L=v.reduce((a,x)=>a+x[0],0),T=v.reduce((a,x)=>a+x[1],0);
       if(T){const pc=Math.round(L/T*100);
-        if(this.preparing){$('setBar').style.width=Math.max(2,pc)+'%';$('setTxt').textContent=`A descarregar… ${pc}% (${Math.round(L/1048576)} de ${Math.round(T/1048576)} MB)`}
+        if(this.preparing){$('setBar').style.width=Math.max(2,pc)+'%';$('setTxt').textContent=pc>=100?'A preparar o motor…':`${pc}% · ${Math.round(L/1048576)} de ${Math.round(T/1048576)} MB`}
         else{$('dlBar').hidden=false;$('dlBar').innerHTML=`⬇️ A preparar a transcrição (só desta vez)… <b>${pc}%</b>`}}}
-    else if(d.type==='ready'){$('dlBar').hidden=true;await DB.setK('ready:'+d.model,true);this.isReady=true;render();await DB.setK('setupSeen',true);
-      if(this.preparing){this.preparing=false;$('setBar').style.width='100%';$('setTxt').textContent='✔️ Pronto. A partir de agora funciona sem internet.';$('setGo').textContent='✔️ Pronto';
-        setTimeout(()=>{if($('sSetup').classList.contains('show'))show(null)},1500);
+    else if(d.type==='ready'){$('dlBar').hidden=true;await DB.setK('ready:'+d.model,true);await DB.setK('gpuTry',false);this.isReady=true;render();await DB.setK('setupSeen',true);
+      if(this.preparing){this.preparing=false;this.step(3);
         entries.filter(e=>e.pending&&e.audio).forEach(e=>this.request(e.id))}}
     else if(d.type==='prog'){this.p=d.p;const el=document.querySelector(`.entry[data-id="${d.id}"] .trst`);if(el)el.textContent=`⏳ A escrever o que disseste… ${Math.round(d.p*100)}%`}
-    else if(d.type==='done'){const e=entries.find(x=>x.id===d.id);
+    else if(d.type==='done'){await DB.setK('gpuTry',false);const e=entries.find(x=>x.id===d.id);
       if(e){e.text=d.text;e.pending=!d.text;const keep=!!(await DB.getK('audio'));
         if(d.text&&!keep){e.audio=false;try{await DB.req(DB.tx('a','readwrite').delete(e.id))}catch{}}
         const {...rec}=e;await DB.put(rec)}
       this.busy=null;await load();toast(d.text?'✔️ Texto pronto':'Não percebi nada nesta gravação');this.next()}
     else if(d.type==='err'){
-      if(this.preparing){this.preparing=false;$('setTxt').textContent='Não consegui descarregar. Confirma que tens internet e tenta outra vez.';$('setGo').disabled=false;$('setGo').textContent='🔄 Tentar Outra Vez';try{this.w&&this.w.terminate()}catch{}this.w=null;return}
+      if(this.preparing){this.preparing=false;await DB.setK('gpuTry',false);try{this.w&&this.w.terminate()}catch{}this.w=null;
+        this.step(1,'Não consegui instalar. Confirma que tens internet e tenta outra vez.');return}
       this.fail('A transcrição falhou: '+d.msg.slice(0,80))}
   },
   fail(m){$('dlBar').hidden=true;this.busy=null;render();toast(m);try{this.w&&this.w.terminate()}catch{}this.w=null;setTimeout(()=>this.next(),500)}
 };
-async function toPCM(segs){ // áudio → 16 kHz mono, como o Whisper precisa
+async function toPCM(segs){ // áudio → 16 kHz mono, como o Whisper precisa (feito à mão: funciona em todos os Safari)
   const Ctx=window.AudioContext||window.webkitAudioContext;const ac=new Ctx();const parts=[];
-  try{for(const b of segs){const buf=await ac.decodeAudioData(await b.arrayBuffer());
-    const len=Math.ceil(buf.duration*16000);const off=new OfflineAudioContext(1,len,16000);
-    const src=off.createBufferSource();src.buffer=buf;src.connect(off.destination);src.start();
-    parts.push((await off.startRendering()).getChannelData(0))}}finally{try{ac.close()}catch{}}
+  try{for(const b of segs){const ab=await b.arrayBuffer();
+    const buf=await new Promise((res,rej)=>{const p=ac.decodeAudioData(ab,res,rej);if(p&&p.then)p.then(res,rej)});
+    const n=buf.length,ch=buf.numberOfChannels,mono=new Float32Array(n);
+    for(let c=0;c<ch;c++){const d=buf.getChannelData(c);for(let i=0;i<n;i++)mono[i]+=d[i]/ch}
+    const r=buf.sampleRate/16000,len=Math.floor(n/r),out=new Float32Array(len);
+    for(let i=0;i<len;i++){const x=i*r,k=Math.floor(x),f=x-k;out[i]=mono[k]*(1-f)+(mono[k+1]||0)*f}
+    parts.push(out)}}finally{try{ac.close()}catch{}}
   const n=parts.reduce((a,p)=>a+p.length,0),out=new Float32Array(n);let o=0;for(const p of parts){out.set(p,o);o+=p.length}return out}
 function beep(){try{const c=new (window.AudioContext||window.webkitAudioContext)();
   [0,.35,.7].forEach(t=>{const o=c.createOscillator(),g=c.createGain();o.frequency.value=880;g.gain.value=.25;o.connect(g);g.connect(c.destination);o.start(c.currentTime+t);o.stop(c.currentTime+t+.2)});
   setTimeout(()=>c.close(),1500)}catch{}
   try{navigator.vibrate&&navigator.vibrate([300,150,300])}catch{}}
 $('rSave').onclick=()=>Rec.save();
-$('setGo').onclick=()=>TR.prepare();
-$('setLater').onclick=async()=>{await DB.setK('setupSeen',true);show(null);if(!TR.preparing)toast('Preparas depois em ⚙️ Definições, com internet')};
+
 $('rCancel').onclick=()=>Rec.cancel();
 $('rAlarm').onclick=()=>{if(!Rec.on)Rec.go()};
 document.addEventListener('visibilitychange',()=>{
@@ -873,7 +932,8 @@ async function fromLink(){
   await DB.open();
   try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch{}
   await unlock();await fromLink();await load();
-  try{TR.isReady=await TR.ready();
+  try{if(await DB.getK('gpuTry')){await DB.setK('nogpu',true);await DB.setK('gpuTry',false)} // a app foi abaixo a meio: passa ao modo normal
+    TR.isReady=await TR.ready();
     if(TR.isReady)entries.filter(e=>e.pending&&e.audio).forEach(e=>TR.request(e.id));
     else if(!(await DB.getK('setupSeen')))TR.openSetup();}catch{}
   addEventListener('hashchange',async()=>{if(/^#add=/.test(location.hash)){await fromLink();await load()}});
