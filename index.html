@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Diário</title>
+<meta name="theme-color" content="#f5f0e6">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Diário">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<style>
+:root{
+  --bg:#f5f0e6;--card:#fbf8f2;--line:#e6dccb;--txt:#4a4238;--muted:#8a7f70;
+  --acc:#9c7a4f;--acc-soft:#ece1cf;--warn:#b0705a;
+  --safe-b:env(safe-area-inset-bottom,0px);--safe-t:env(safe-area-inset-top,0px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--txt);
+  font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+.app{display:flex;flex-direction:column;height:100%;max-width:640px;margin:0 auto}
+/* Topo fixo */
+.top{flex:none;padding:calc(10px + var(--safe-t)) 14px 6px;border-bottom:1px solid var(--line);background:var(--bg)}
+.bar{display:flex;align-items:center;gap:8px}
+.bar h1{margin:0;font-size:20px;font-weight:650;flex:1;white-space:nowrap}
+.icon-btn{border:1px solid var(--line);background:var(--card);border-radius:10px;height:36px;min-width:36px;padding:0 9px;font-size:17px;display:inline-flex;align-items:center;justify-content:center;gap:5px}
+.icon-btn small{font-size:13px}
+.filters{display:flex;gap:6px;margin-top:8px}
+.filters select,.filters input{height:36px;border:1px solid var(--line);background:var(--card);border-radius:10px;padding:0 8px;min-width:0}
+.filters select{flex:0 0 auto;max-width:42%}
+.filters input{flex:1}
+.words{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;max-height:62px;overflow:hidden}
+.words.open{max-height:none}
+.chip{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:2px 9px;font-size:13px;white-space:nowrap}
+.chip b{font-weight:600;color:var(--muted);font-size:11px;margin-left:3px}
+.chip.l2{font-size:14px}.chip.l3{font-size:15px;font-weight:600}
+.chip.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.chip.on b{color:#f3e9da}
+.chip.more{color:var(--muted)}
+.info{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;color:var(--muted);margin-top:6px;min-height:18px}
+.info button{border:0;background:none;color:var(--acc);padding:0;font-size:12.5px}
+/* Lista */
+.list{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:8px 14px calc(96px + var(--safe-b))}
+.day{font-size:12px;font-weight:600;color:var(--muted);margin:12px 2px 5px}
+.day:first-child{margin-top:4px}
+.entry{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:9px 12px;margin-bottom:7px}
+.entry .h{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted)}
+.entry .t{margin-top:2px;white-space:pre-wrap;word-wrap:break-word;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.entry.open .t{display:block}
+.entry mark{background:#efdcb8;color:inherit;border-radius:3px;padding:0 1px}
+.entry .acts{display:none;gap:8px;margin-top:8px}
+.entry.open .acts{display:flex}
+.entry .acts button{flex:1;height:38px;border:1px solid var(--line);background:var(--bg);border-radius:10px}
+.entry .acts .del{color:var(--warn)}
+.empty{text-align:center;color:var(--muted);padding:40px 20px}
+.empty .big{font-size:42px}
+/* Botão principal */
+.fab{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + var(--safe-b));width:min(612px,calc(100% - 28px));height:58px;border:0;border-radius:16px;background:var(--acc);color:#fff;font-size:18px;font-weight:600;box-shadow:0 4px 14px rgba(120,90,50,.25);display:flex;align-items:center;justify-content:center;gap:8px}
+/* Folhas (ecrãs por cima) */
+.sheet{position:fixed;inset:0;background:var(--bg);display:none;flex-direction:column;z-index:10}
+.sheet.show{display:flex}
+.sheet .sh{flex:none;display:flex;align-items:center;gap:8px;padding:calc(10px + var(--safe-t)) 14px 10px;border-bottom:1px solid var(--line)}
+.sheet .sh h2{margin:0;font-size:18px;flex:1;white-space:nowrap}
+.sheet .sb{flex:1;overflow-y:auto;padding:12px 14px}
+.sheet .sf{flex:none;display:flex;gap:8px;padding:10px 14px calc(12px + var(--safe-b));border-top:1px solid var(--line)}
+.btn{flex:1;height:52px;border-radius:14px;border:1px solid var(--line);background:var(--card);font-size:16px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn.pri{background:var(--acc);border-color:var(--acc);color:#fff}
+.lbl{font-size:12.5px;color:var(--muted);margin:10px 2px 4px;display:block}
+.lbl:first-child{margin-top:0}
+.field{width:100%;height:44px;border:1px solid var(--line);background:var(--card);border-radius:12px;padding:0 10px}
+textarea.field{height:auto;min-height:46vh;padding:10px;resize:none;line-height:1.5}
+.hint{font-size:12.5px;color:var(--muted);margin-top:6px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.opt{border:1.5px solid var(--line);background:var(--card);border-radius:14px;padding:12px 8px;text-align:center}
+.opt .i{font-size:26px;display:block}
+.opt .n{font-weight:600;font-size:14px}
+.opt .d{font-size:12px;color:var(--muted)}
+.opt.on{border-color:var(--acc);background:var(--acc-soft)}
+.row2{display:flex;gap:8px}.row2>*{flex:1}
+.check{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-top:10px}
+.check input{width:22px;height:22px;accent-color:var(--acc)}
+.menu{display:flex;flex-direction:column;gap:8px}
+.menu button{display:flex;align-items:center;gap:12px;text-align:left;height:58px;border:1px solid var(--line);background:var(--card);border-radius:14px;padding:0 14px;font-size:16px}
+.menu button .i{font-size:22px;width:28px;text-align:center}
+.menu button span.s{display:block;font-size:12px;color:var(--muted)}
+.sum{background:var(--acc-soft);border-radius:12px;padding:10px 12px;margin-top:12px;font-size:14px}
+/* PIN */
+.lock{position:fixed;inset:0;background:var(--bg);z-index:30;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:20px}
+.lock.show{display:flex}
+.lock .big{font-size:44px}
+.lock input{width:200px;height:52px;text-align:center;font-size:24px;letter-spacing:8px;border:1px solid var(--line);border-radius:14px;background:var(--card)}
+.lock .err{color:var(--warn);font-size:13px;min-height:18px}
+.toast{position:fixed;left:50%;bottom:calc(90px + var(--safe-b));transform:translateX(-50%);background:var(--txt);color:var(--bg);padding:9px 16px;border-radius:12px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:40;white-space:nowrap}
+.toast.show{opacity:.95}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <div class="bar">
+      <h1>📖 Diário</h1>
+      <button class="icon-btn" id="bExport" aria-label="Exportar">📤 <small>Exportar</small></button>
+      <button class="icon-btn" id="bSettings" aria-label="Definições">⚙️</button>
+    </div>
+    <div class="filters">
+      <select id="fPeriod" aria-label="Período">
+        <option value="all">📅 Tudo</option>
+        <option value="7">📅 7 dias</option>
+        <option value="30">📅 30 dias</option>
+        <option value="month">📅 Este mês</option>
+        <option value="lastmonth">📅 Mês passado</option>
+        <option value="year">📅 Este ano</option>
+      </select>
+      <input id="fSearch" type="search" placeholder="🔍 Pesquisar" autocomplete="off">
+    </div>
+    <div class="words" id="words"></div>
+    <div class="info"><span id="count"></span><button id="bClear" hidden>✕ Limpar filtros</button></div>
+  </div>
+  <div class="list" id="list"></div>
+</div>
+<button class="fab" id="bNew">🎙️ Novo Registo</button>
+
+<!-- Novo / editar registo -->
+<div class="sheet" id="sEdit">
+  <div class="sh"><h2 id="eTitle">🎙️ Novo Registo</h2></div>
+  <div class="sb">
+    <label class="lbl" for="eDate">Data e hora</label>
+    <input class="field" id="eDate" type="datetime-local">
+    <label class="lbl" for="eText">Texto</label>
+    <textarea class="field" id="eText" placeholder="Toca no 🎤 do teclado e fala, ou cola aqui a transcrição."></textarea>
+  </div>
+  <div class="sf">
+    <button class="btn" id="eCancel">Cancelar</button>
+    <button class="btn pri" id="eSave">✔️ Guardar</button>
+  </div>
+</div>
+
+<!-- Exportar -->
+<div class="sheet" id="sExport">
+  <div class="sh"><h2>📤 Exportar</h2><button class="icon-btn" data-close aria-label="Fechar">✕</button></div>
+  <div class="sb">
+    <label class="lbl" for="xPeriod">Período</label>
+    <select class="field" id="xPeriod">
+      <option value="all">Tudo</option>
+      <option value="7">Últimos 7 dias</option>
+      <option value="30">Últimos 30 dias</option>
+      <option value="month">Este mês</option>
+      <option value="lastmonth">Mês passado</option>
+      <option value="year">Este ano</option>
+      <option value="custom">Escolher datas</option>
+    </select>
+    <div class="row2" id="xCustom" hidden>
+      <div><label class="lbl" for="xFrom">De</label><input class="field" id="xFrom" type="date"></div>
+      <div><label class="lbl" for="xTo">Até</label><input class="field" id="xTo" type="date"></div>
+    </div>
+    <label class="check" id="xWordRow" hidden><input type="checkbox" id="xWord"><span id="xWordTxt"></span></label>
+    <span class="lbl">Formato</span>
+    <div class="opts" id="xFmt">
+      <button class="opt on" data-v="txt"><span class="i">📄</span><span class="n">Texto</span><div class="d">.txt simples</div></button>
+      <button class="opt" data-v="md"><span class="i">🗒️</span><span class="n">Notion</span><div class="d">.md com títulos</div></button>
+    </div>
+    <div class="sum" id="xSum"></div>
+  </div>
+  <div class="sf">
+    <button class="btn" id="xCopy">📋 Copiar</button>
+    <button class="btn pri" id="xGo">💾 Guardar Ficheiro</button>
+  </div>
+</div>
+
+<!-- Definições -->
+<div class="sheet" id="sSettings">
+  <div class="sh"><h2>⚙️ Definições</h2><button class="icon-btn" data-close aria-label="Fechar">✕</button></div>
+  <div class="sb">
+    <div class="menu">
+      <button id="mBackup"><span class="i">💾</span><span>Cópia de Segurança<span class="s">Guarda tudo num ficheiro, para mudar de telemóvel</span></span></button>
+      <button id="mImport"><span class="i">📥</span><span>Importar<span class="s">Cópia de segurança ou ficheiro .md exportado</span></span></button>
+      <button id="mPin"><span class="i">🔒</span><span id="mPinTxt">Definir PIN</span></button>
+    </div>
+    <input type="file" id="fileIn" accept=".json,.md,.txt,application/json,text/plain,text/markdown" hidden>
+    <p class="hint" id="sInfo"></p>
+  </div>
+</div>
+
+<!-- PIN -->
+<div class="lock" id="lock">
+  <div class="big">🔒</div>
+  <div id="lockMsg">Introduz o PIN</div>
+  <input id="lockIn" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="8" autocomplete="off">
+  <div class="err" id="lockErr"></div>
+  <button class="btn pri" id="lockGo" style="flex:none;width:200px">Entrar</button>
+  <button class="icon-btn" id="lockCancel" hidden>Cancelar</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+/* ---------- Armazenamento (IndexedDB, só no aparelho) ---------- */
+const DB={db:null,
+  open(){return new Promise((res,rej)=>{const r=indexedDB.open('diario',1);
+    r.onupgradeneeded=()=>{const d=r.result;if(!d.objectStoreNames.contains('e'))d.createObjectStore('e',{keyPath:'id'});if(!d.objectStoreNames.contains('k'))d.createObjectStore('k')};
+    r.onsuccess=()=>{this.db=r.result;res()};r.onerror=()=>rej(r.error)})},
+  tx(s,m){return this.db.transaction(s,m).objectStore(s)},
+  req(r){return new Promise((res,rej)=>{r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})},
+  all(){return this.req(this.tx('e','readonly').getAll())},
+  put(e){return this.req(this.tx('e','readwrite').put(e))},
+  del(id){return this.req(this.tx('e','readwrite').delete(id))},
+  putMany(list){return new Promise((res,rej)=>{const t=this.db.transaction('e','readwrite');const s=t.objectStore('e');list.forEach(x=>s.put(x));t.oncomplete=res;t.onerror=()=>rej(t.error)})},
+  getK(k){return this.req(this.tx('k','readonly').get(k))},
+  setK(k,v){return this.req(this.tx('k','readwrite').put(v,k))},
+  delK(k){return this.req(this.tx('k','readwrite').delete(k))}
+};
+
+/* ---------- Estado ---------- */
+let entries=[];               // {id,date(ISO),text}
+const st={period:'all',q:'',word:null,openId:null,wordsOpen:false,editId:null,fmt:'txt'};
+const $=id=>document.getElementById(id);
+
+/* ---------- Utilitários ---------- */
+const norm=s=>s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+const pad=n=>String(n).padStart(2,'0');
+const toLocalInput=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+const dayKey=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const fDay=d=>d.toLocaleDateString('pt-PT',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+const cap1=s=>s.charAt(0).toUpperCase()+s.slice(1);
+const fTime=d=>`${pad(d.getHours())}:${pad(d.getMinutes())}`;
+const fShort=d=>d.toLocaleDateString('pt-PT');
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove('show'),2200)}
+
+/* Palavras que não contam (conectores, interjeições, verbos muito comuns) */
+const STOP=new Set(norm(`a à ao aos as às o os um uma uns umas de do da dos das dum duma em no na nos nas num numa por pelo pela pelos pelas para pra pro com sem sob sobre entre até após desde contra
+e é ou mas nem que se porque pois porém então logo assim também já ainda só sim não nao mais menos muito muita muitos muitas pouco pouca tão tanto tanta todo toda todos todas tudo nada algo alguém ninguém
+eu tu ele ela nós vós eles elas me te lhe nos vos lhes se mim ti si comigo contigo meu minha meus minhas teu tua teus tuas seu sua seus suas nosso nossa nossos nossas dele dela deles delas
+este esta estes estas esse essa esses essas aquele aquela aqueles aquelas isto isso aquilo aqui ali lá cá aí onde quando como quem qual quais quanto quanta quantos quantas cujo
+ser sou és somos são era eram fui foi fomos foram seja sejam sendo sido será serão seria
+estar estou está estás estamos estão estava estavam esteve estive estiveram estado esteja
+ter tenho tens tem temos têm tinha tinham tive teve tiveram tido tenha terá teria
+haver há havia houve haja ir vou vais vai vamos vão ia iam fui indo ido
+fazer faço faz fazemos fazem fiz fez fizeram feito fazendo fazia
+dizer digo diz disse dizia dito poder posso pode podemos podem pude pôde podia poderia
+dar dou dá dei deu dava ver vejo vê vi viu via vendo visto querer quero quer queria quis
+saber sei sabe sabia achar acho acha achei pensar penso pensei falar falo falei
+ok okay pronto tipo coisa coisas cena cenas pá né ah eh oh hum hmm uh ai olha olhe bem bom boa enfim portanto entanto aliás
+hoje ontem amanhã agora depois antes sempre nunca vez vezes dia dias hora horas ano anos agora talvez
+então tal tais cada outro outra outros outras mesmo mesma mesmos mesmas próprio própria qualquer quaisquer
+the and of to in is it that for on with as was are be this have i you he she we they not but or at`).split(/\s+/));
+
+function tokens(text){return (norm(text).match(/[a-zçñ]+(?:-[a-z]+)*/g)||[])}
+const DISP=new Map(); // palavra sem acentos -> como se escreve
+function learn(text){for(const w of (text.toLowerCase().match(/[\p{L}]+(?:-[\p{L}]+)*/gu)||[])){const k=norm(w);if(!DISP.has(k)||w!==k)DISP.set(k,w)}}
+const disp=w=>DISP.get(w)||w;
+
+/* ---------- Filtros ---------- */
+function range(p,from,to){
+  const now=new Date(),s=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  switch(p){
+    case '7':return[new Date(s-6*864e5),null];
+    case '30':return[new Date(s-29*864e5),null];
+    case 'month':return[new Date(now.getFullYear(),now.getMonth(),1),null];
+    case 'lastmonth':return[new Date(now.getFullYear(),now.getMonth()-1,1),new Date(now.getFullYear(),now.getMonth(),1)];
+    case 'year':return[new Date(now.getFullYear(),0,1),null];
+    case 'custom':return[from?new Date(from+'T00:00'):null,to?new Date(new Date(to+'T00:00').getTime()+864e5):null];
+    default:return[null,null];
+  }
+}
+function inRange(e,[a,b]){const d=new Date(e.date);return(!a||d>=a)&&(!b||d<b)}
+function hasWord(e,w){return tokens(e.text).includes(w)}
+function matchQ(e,q){if(!q)return true;const t=norm(e.text);return norm(q).split(/\s+/).filter(Boolean).every(x=>t.includes(x))}
+function baseFiltered(){const r=range(st.period);return entries.filter(e=>inRange(e,r)&&matchQ(e,st.q))}
+
+/* ---------- Desenho ---------- */
+function renderWords(base){
+  const freq=new Map(),shown=new Map();
+  for(const e of base){
+    const seen=new Set();
+    for(const w of tokens(e.text)){
+      if(w.length<4||STOP.has(w)||seen.has(w))continue;seen.add(w);   // conta em quantos registos aparece
+      freq.set(w,(freq.get(w)||0)+1);
+    }
+  }
+  let top=[...freq].filter(([,n])=>n>=2||base.length<3).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])).slice(0,30);
+  if(st.word&&!top.find(([w])=>w===st.word))top.unshift([st.word,freq.get(st.word)||0]);
+  const box=$('words');
+  if(!top.length){box.innerHTML='';box.hidden=true;return}
+  box.hidden=false;
+  const max=top[0][1]||1;
+  box.innerHTML=top.map(([w,n])=>{const l=n>=max*.66?'l3':n>=max*.33?'l2':'';return`<button class="chip ${l}${st.word===w?' on':''}" data-w="${esc(w)}">${esc(disp(w))}<b>${n}</b></button>`}).join('');
+  box.classList.toggle('open',st.wordsOpen);
+  // botão "mais" quando não cabe
+  requestAnimationFrame(()=>{
+    if(!st.wordsOpen&&box.scrollHeight>box.clientHeight+2){
+      const m=document.createElement('button');m.className='chip more';m.textContent='＋ mais';m.dataset.more='1';
+      box.appendChild(m);
+      while(box.scrollHeight>box.clientHeight+2&&m.previousElementSibling&&!m.previousElementSibling.classList.contains('on'))m.previousElementSibling.remove();
+    }else if(st.wordsOpen){const m=document.createElement('button');m.className='chip more';m.textContent='－ menos';m.dataset.more='1';box.appendChild(m)}
+  });
+}
+function hl(text){
+  let h=esc(text);
+  const terms=[];if(st.word)terms.push(st.word);if(st.q)terms.push(...norm(st.q).split(/\s+/).filter(x=>x.length>1));
+  if(!terms.length)return h;
+  // marcar ignorando acentos: percorre o texto normalizado em paralelo
+  const n=norm(h);const marks=[];
+  for(const t of terms){let i=0;while((i=n.indexOf(t,i))>-1){marks.push([i,i+t.length]);i+=t.length}}
+  if(!marks.length)return h;
+  marks.sort((a,b)=>a[0]-b[0]);let out='',p=0;
+  for(const[a,b]of marks){if(a<p)continue;out+=h.slice(p,a)+'<mark>'+h.slice(a,b)+'</mark>';p=b}
+  return out+h.slice(p);
+}
+function render(){
+  const base=baseFiltered();
+  renderWords(base);
+  const list=st.word?base.filter(e=>hasWord(e,st.word)):base;
+  const L=$('list');
+  const filt=st.period!=='all'||st.q||st.word;
+  $('bClear').hidden=!filt;
+  $('count').textContent=entries.length?`${list.length} ${list.length===1?'registo':'registos'}${filt?' de '+entries.length:''}`:'';
+  if(!entries.length){L.innerHTML=`<div class="empty"><div class="big">🎙️</div><p>Ainda não há registos.<br>Carrega em <b>Novo Registo</b> para começar.</p></div>`;return}
+  if(!list.length){L.innerHTML=`<div class="empty"><div class="big">🔍</div><p>Nenhum registo com estes filtros.</p></div>`;return}
+  let html='',last='';
+  for(const e of list){
+    const d=new Date(e.date),k=dayKey(d);
+    if(k!==last){html+=`<div class="day">${cap1(fDay(d))}</div>`;last=k}
+    const words=e.text.trim().split(/\s+/).length;
+    html+=`<div class="entry${st.openId===e.id?' open':''}" data-id="${e.id}">
+      <div class="h"><span>🕒 ${fTime(d)}</span><span>${words} palavras</span></div>
+      <div class="t">${hl(e.text)}</div>
+      <div class="acts"><button data-a="edit">✏️ Editar</button><button data-a="del" class="del">🗑️ Apagar</button></div></div>`;
+  }
+  L.innerHTML=html;
+}
+async function load(){entries=(await DB.all()).sort((a,b)=>b.date.localeCompare(a.date));DISP.clear();entries.forEach(e=>learn(e.text));render()}
+
+/* ---------- Eventos da lista ---------- */
+$('fPeriod').onchange=e=>{st.period=e.target.value;render()};
+$('fSearch').oninput=e=>{st.q=e.target.value.trim();render()};
+$('bClear').onclick=()=>{st.period='all';st.q='';st.word=null;$('fPeriod').value='all';$('fSearch').value='';render()};
+$('words').onclick=e=>{const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.more){st.wordsOpen=!st.wordsOpen}else{st.word=st.word===b.dataset.w?null:b.dataset.w;st.openId=null}
+  render();$('list').scrollTop=0};
+$('list').onclick=async e=>{
+  const card=e.target.closest('.entry');if(!card)return;const id=card.dataset.id;
+  const a=e.target.closest('[data-a]');
+  if(a&&a.dataset.a==='edit'){openEdit(entries.find(x=>x.id===id));return}
+  if(a&&a.dataset.a==='del'){if(confirm('Apagar este registo?')){await DB.del(id);st.openId=null;await load();toast('🗑️ Registo apagado')}return}
+  st.openId=st.openId===id?null:id;render();
+};
+
+/* ---------- Novo / editar ---------- */
+function show(id){document.querySelectorAll('.sheet').forEach(s=>s.classList.remove('show'));if(id)$(id).classList.add('show')}
+document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>show(null));
+function openEdit(e){
+  st.editId=e?e.id:null;
+  $('eTitle').textContent=e?'✏️ Editar Registo':'🎙️ Novo Registo';
+  $('eDate').value=toLocalInput(e?new Date(e.date):new Date());
+  $('eText').value=e?e.text:'';
+  show('sEdit');setTimeout(()=>$('eText').focus(),50);
+}
+$('bNew').onclick=()=>openEdit(null);
+$('eCancel').onclick=()=>{if($('eText').value.trim()&&!st.editId&&!confirm('Sair sem guardar?'))return;show(null)};
+$('eSave').onclick=async()=>{
+  const text=$('eText').value.trim();if(!text){toast('O texto está vazio');return}
+  const d=$('eDate').value?new Date($('eDate').value):new Date();
+  const prev=st.editId?entries.find(x=>x.id===st.editId):null;
+  // mantém os segundos originais se a data não mudou
+  const iso=prev&&toLocalInput(new Date(prev.date))===$('eDate').value?prev.date:d.toISOString();
+  await DB.put({id:st.editId||uid(),date:iso,text});
+  show(null);await load();toast(st.editId?'✔️ Alterações guardadas':'✔️ Registo guardado');
+};
+
+/* ---------- Exportar ---------- */
+function exportList(){
+  const p=$('xPeriod').value,r=range(p,$('xFrom').value,$('xTo').value);
+  let l=entries.filter(e=>inRange(e,r));
+  if(st.word&&$('xWord').checked)l=l.filter(e=>hasWord(e,st.word));
+  return l.slice().reverse(); // do mais antigo para o mais recente: lê-se como um diário
+}
+function periodLabel(l){if(!l.length)return'';const a=new Date(l[0].date),b=new Date(l[l.length-1].date);return fShort(a)===fShort(b)?fShort(a):`${fShort(a)} a ${fShort(b)}`}
+function buildText(l,fmt){
+  const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
+  const words=st.word&&$('xWord').checked?` · palavra «${disp(st.word)}»`:'';
+  let out='',last='';
+  if(fmt==='md'){
+    out+=`# Diário · ${periodLabel(l)}\n\n${l.length} registos${words}\n`;
+    for(const e of l){const d=new Date(e.date),k=dayKey(d);
+      if(k!==last){out+=`\n## ${cap(fDay(d))}\n`;last=k}
+      out+=`\n### ${fTime(d)}\n\n${e.text.trim()}\n`}
+  }else{
+    out+=`DIÁRIO · ${periodLabel(l)}\n${l.length} registos${words}\n`;
+    for(const e of l){const d=new Date(e.date),k=dayKey(d);
+      if(k!==last){out+=`\n\n==================================\n${cap(fDay(d)).toUpperCase()}\n==================================\n`;last=k}
+      out+=`\n[${fTime(d)}]\n${e.text.trim()}\n`}
+  }
+  return out;
+}
+function updSum(){
+  $('xCustom').hidden=$('xPeriod').value!=='custom';
+  const l=exportList();
+  const kb=Math.max(1,Math.round(new Blob([buildText(l,st.fmt)]).size/1024));
+  $('xSum').textContent=l.length?`📄 ${l.length} ${l.length===1?'registo':'registos'} · ${periodLabel(l)} · ${kb} KB`:'Não há registos neste período.';
+  $('xGo').disabled=$('xCopy').disabled=!l.length;
+}
+$('bExport').onclick=()=>{
+  $('xPeriod').value=['all','7','30','month','lastmonth','year'].includes(st.period)?st.period:'all';
+  $('xWordRow').hidden=!st.word;$('xWord').checked=!!st.word;
+  if(st.word)$('xWordTxt').innerHTML=`Só os registos com a palavra <b>«${esc(disp(st.word))}»</b>`;
+  const t=new Date();if(!$('xTo').value)$('xTo').value=dayKey(t);
+  if(!$('xFrom').value)$('xFrom').value=dayKey(new Date(t.getFullYear(),t.getMonth(),1));
+  updSum();show('sExport');
+};
+['xPeriod','xFrom','xTo','xWord'].forEach(i=>$(i).onchange=updSum);
+$('xFmt').onclick=e=>{const b=e.target.closest('.opt');if(!b)return;st.fmt=b.dataset.v;document.querySelectorAll('#xFmt .opt').forEach(o=>o.classList.toggle('on',o===b));updSum()};
+async function saveFile(name,content,type){
+  const file=new File([content],name,{type});
+  try{if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:name});return true}}
+  catch(err){if(err.name==='AbortError')return false}
+  const a=document.createElement('a');a.href=URL.createObjectURL(file);a.download=name;document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000);return true;
+}
+$('xGo').onclick=async()=>{const l=exportList();const ext=st.fmt;
+  const name=`diario_${dayKey(new Date(l[0].date))}_a_${dayKey(new Date(l[l.length-1].date))}.${ext}`;
+  if(await saveFile(name,buildText(l,ext),ext==='md'?'text/markdown':'text/plain'))toast('✔️ Ficheiro pronto')};
+$('xCopy').onclick=async()=>{const t=buildText(exportList(),st.fmt);
+  try{await navigator.clipboard.writeText(t);toast('📋 Copiado')}catch{toast('Não foi possível copiar')}};
+
+/* ---------- Definições: cópia, importar, PIN ---------- */
+$('bSettings').onclick=async()=>{$('mPinTxt').innerHTML=(await DB.getK('pin'))?'Tirar PIN<span class="s">O diário deixa de pedir PIN ao abrir</span>':'Definir PIN<span class="s">Pede o PIN sempre que abres o diário</span>';
+  $('sInfo').textContent=`${entries.length} registos guardados só neste telemóvel.`;show('sSettings')};
+$('mBackup').onclick=async()=>{if(!entries.length){toast('Ainda não há registos');return}
+  await saveFile(`diario_copia_${dayKey(new Date())}.json`,JSON.stringify({app:'diario',v:1,entries},null,1),'application/json');
+  await DB.setK('lastBackup',new Date().toISOString())};
+$('mImport').onclick=()=>$('fileIn').click();
+const MONTHS=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+function parseMd(txt){
+  // Lê o formato exportado: "## <dia por extenso>" e "### HH:MM"
+  const out=[];let day=null,cur=null;
+  const flush=()=>{if(cur&&cur.text.trim())out.push(cur);cur=null};
+  for(const line of txt.split(/\r?\n/)){
+    let m=line.match(/^##\s+(?:[^,]+,\s*)?(\d{1,2})\s+de\s+([a-zç]+)\s+de\s+(\d{4})/i);
+    if(m&&!line.startsWith('###')){flush();const mi=MONTHS.indexOf(m[2].toLowerCase());day=mi>-1?[+m[3],mi,+m[1]]:null;continue}
+    m=line.match(/^##\s+(\d{4})-(\d{2})-(\d{2})/);
+    if(m&&!line.startsWith('###')){flush();day=[+m[1],+m[2]-1,+m[3]];continue}
+    m=line.match(/^###\s+(\d{1,2}):(\d{2})/);
+    if(m&&day){flush();cur={id:uid(),date:new Date(day[0],day[1],day[2],+m[1],+m[2]).toISOString(),text:''};continue}
+    if(/^#\s/.test(line)&&!cur)continue;
+    if(cur)cur.text+=line+'\n';
+  }
+  flush();out.forEach(e=>e.text=e.text.trim());return out;
+}
+$('fileIn').onchange=async e=>{
+  const f=e.target.files[0];e.target.value='';if(!f)return;
+  const txt=await f.text();let list=[];
+  try{if(/\.json$/i.test(f.name)||txt.trim().startsWith('{')){const j=JSON.parse(txt);list=(j.entries||j).filter(x=>x.date&&x.text).map(x=>({id:x.id||uid(),date:new Date(x.date).toISOString(),text:String(x.text)}))}
+      else list=parseMd(txt)}catch{toast('Ficheiro não reconhecido');return}
+  if(!list.length){toast('Não encontrei registos no ficheiro');return}
+  const keys=new Set(entries.map(x=>x.date.slice(0,16)+'|'+norm(x.text).slice(0,80)));
+  const novos=list.filter(x=>!keys.has(x.date.slice(0,16)+'|'+norm(x.text).slice(0,80)));
+  if(!novos.length){toast('Estes registos já estavam no diário');return}
+  if(!confirm(`Importar ${novos.length} ${novos.length===1?'registo novo':'registos novos'}?`))return;
+  await DB.putMany(novos);await load();show(null);toast(`✔️ ${novos.length} importados`);
+};
+async function hashPin(p){const salt='diario-v1:';
+  if(crypto.subtle){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(salt+p));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+  let h=5381;for(const c of salt+p)h=(h*33^c.charCodeAt(0))>>>0;return'f'+h.toString(16)}
+function askPin(msg,cancel,err){return new Promise(res=>{
+  $('lockMsg').textContent=msg;$('lockIn').value='';$('lockErr').textContent=err||'';$('lockCancel').hidden=!cancel;$('lock').classList.add('show');
+  setTimeout(()=>$('lockIn').focus(),60);
+  const done=v=>{$('lock').classList.remove('show');$('lockGo').onclick=$('lockCancel').onclick=$('lockIn').onkeydown=null;res(v)};
+  $('lockGo').onclick=()=>{const v=$('lockIn').value;if(!/^\d{4,8}$/.test(v)){$('lockErr').textContent='O PIN tem de ter 4 a 8 números';return}done(v)};
+  $('lockIn').onkeydown=e=>{if(e.key==='Enter')$('lockGo').click()};
+  $('lockCancel').onclick=()=>done(null);
+})}
+$('mPin').onclick=async()=>{
+  const cur=await DB.getK('pin');
+  if(cur){const p=await askPin('PIN atual',true);if(p===null)return;if(await hashPin(p)!==cur){toast('PIN errado');return}
+    await DB.delK('pin');toast('🔓 PIN retirado');$('bSettings').click();return}
+  const a=await askPin('Novo PIN (4 a 8 números)',true);if(a===null)return;
+  const b=await askPin('Repete o PIN',true);if(b===null)return;
+  if(a!==b){toast('Os PIN não coincidem');return}
+  await DB.setK('pin',await hashPin(a));toast('🔒 PIN definido');$('bSettings').click();
+};
+async function unlock(){const h=await DB.getK('pin');if(!h)return;
+  let err='';for(;;){const p=await askPin('Introduz o PIN',false,err);if(await hashPin(p)===h)return;err='PIN errado, tenta outra vez'}}
+
+/* ---------- Atalho da Siri: #add=texto ---------- */
+async function fromLink(){
+  const m=location.hash.match(/^#add=(.*)$/s);if(!m)return;
+  let t='';try{t=decodeURIComponent(m[1].replace(/\+/g,' ')).trim()}catch{}
+  history.replaceState(null,'',location.pathname+location.search);
+  if(t){await DB.put({id:uid(),date:new Date().toISOString(),text:t});toast('✔️ Registo guardado')}
+}
+
+/* ---------- Arranque ---------- */
+(async()=>{
+  await DB.open();
+  try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch{}
+  await unlock();await fromLink();await load();
+  addEventListener('hashchange',async()=>{if(/^#add=/.test(location.hash)){await fromLink();await load()}});
+  if('serviceWorker'in navigator&&location.protocol!=='file:')navigator.serviceWorker.register('sw.js').catch(()=>{});
+})();
+</script>
+</body>
+</html>
