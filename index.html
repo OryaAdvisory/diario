@@ -144,6 +144,28 @@ textarea.field{height:auto;min-height:46vh;padding:10px;resize:none;line-height:
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.8)}}
 .timer{font-size:28px;font-weight:650;font-variant-numeric:tabular-nums}
 .rec-state{text-align:center;font-size:13px;color:var(--muted);min-height:18px}
+.menu .opts .opt{display:block;height:auto;text-align:center;padding:10px 6px;gap:0}
+.menu .opts .opt .i{display:block;width:auto;font-size:24px}
+.menu .opts .opt.on{border-color:var(--acc);background:var(--acc-soft)}
+.setup{text-align:center}
+.setup .sbig{font-size:54px;margin-top:10px}
+.setup h3{margin:6px 0 12px;font-size:21px}
+.setup ul{list-style:none;padding:0;margin:0 auto;max-width:420px;text-align:left;display:flex;flex-direction:column;gap:10px}
+.setup li{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:14.5px}
+.setprog{margin:18px auto 0;max-width:420px}
+.pb{height:12px;border-radius:6px;background:var(--line);overflow:hidden}
+.pb i{display:block;height:100%;width:0;background:var(--acc);transition:width .3s}
+.setprog span{display:block;margin-top:8px;font-size:14px;color:var(--muted)}
+.recmid{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:0 24px}
+.mic{width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,#f3e3cc,#e7d2b4);display:flex;align-items:center;justify-content:center;font-size:52px;box-shadow:0 0 0 10px rgba(196,154,108,.15)}
+.paused .mic{filter:grayscale(1);opacity:.6}
+.meter{display:flex;gap:6px;align-items:flex-end;height:44px}
+.meter i{width:10px;height:6px;border-radius:5px;background:var(--acc);transition:height .08s}
+.rec-hint{text-align:center;color:var(--muted);font-size:14px;max-width:300px;margin:0}
+.dlbar{margin-top:8px;font-size:13px;background:var(--acc-soft);border-radius:10px;padding:7px 10px;color:var(--txt)}
+.dlbar b{font-variant-numeric:tabular-nums}
+.trbtn{margin-top:6px;border:1px solid var(--acc);background:var(--acc-soft);border-radius:10px;height:36px;padding:0 12px;font-size:14px;font-weight:600}
+.trst{color:var(--acc);font-weight:600}
 .live{flex:1;overflow-y:auto;margin:10px 14px;padding:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;font-size:16px;line-height:1.5;resize:none;width:auto;font-family:inherit;color:var(--txt);outline:none}
 .kb{margin:8px 14px 0;padding:10px 12px;border-radius:14px;background:var(--acc-soft);text-align:center;font-size:14px;color:var(--txt)}
 .kb .btn{margin-top:8px;width:100%;flex:none;height:54px}
@@ -188,6 +210,7 @@ textarea.field{height:auto;min-height:46vh;padding:10px;resize:none;line-height:
     </div>
     <div class="dates" id="fDates" hidden><label>De <input type="date" id="fFrom"></label><label>Até <input type="date" id="fTo"></label></div>
     <div class="words" id="selChips" hidden></div>
+    <div class="dlbar" id="dlBar" hidden></div>
     <div class="selbar" id="selBar" hidden><span id="selTxt"></span><button id="selView">📖 Ver</button><button id="selExport">📤 Exportar</button><button id="selClear" aria-label="Limpar">✕</button></div>
     <div class="info"><span id="count"></span><button id="bClear" hidden>✕ Limpar filtros</button></div>
   </div>
@@ -195,7 +218,7 @@ textarea.field{height:auto;min-height:46vh;padding:10px;resize:none;line-height:
   <div class="calv" id="cal" hidden></div>
   <div class="list" id="list" hidden></div>
 </div>
-<div class="fabs"><button class="fab" id="bNew">🎙️ Novo Registo</button><button class="fab2" id="bPaste">📋 Do Dictafone</button></div>
+<div class="fabs"><button class="fab" id="bNew">🎙️ Novo Registo</button></div>
 
 <!-- Novo / editar registo -->
 <div class="sheet" id="sEdit">
@@ -215,14 +238,31 @@ textarea.field{height:auto;min-height:46vh;padding:10px;resize:none;line-height:
 <!-- Gravar -->
 <div class="sheet" id="sRec">
   <div class="rec-top"><span class="dot"></span><span class="timer" id="rTimer">0:00</span></div>
-  <div class="rec-state" id="rState">A ouvir…</div>
+  <div class="rec-state" id="rState">A gravar…</div>
   <div class="alarm" id="rAlarm">⚠️ A gravação parou<br><small>Toca aqui para continuar</small></div>
-  <div class="kb" id="rKb" hidden><span id="rKbMsg"></span><button class="btn pri" id="rKbBtn">⌨️ Ditar pelo Teclado</button><button class="retry" id="rAuto" hidden>🔄 Tentar a transcrição automática</button></div>
-  <textarea class="live" id="rText" placeholder="Começa a falar…"></textarea>
+  <div class="recmid"><div class="mic">🎙️</div><div class="meter" id="rMeter"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <p class="rec-hint">Fala à vontade. Quando acabares, carrega em <b>Parar e Guardar</b>; o texto é escrito a seguir, no telemóvel.</p></div>
   <div class="rec-btns">
     <button class="btn" id="rCancel">✕ Cancelar</button>
     <button class="btn pri stop" id="rSave">✔️ Parar e Guardar</button>
   </div>
+</div>
+
+<!-- Preparar a transcrição (primeira vez) -->
+<div class="sheet" id="sSetup">
+  <div class="sh"><h2>🎙️ Voice Journal</h2></div>
+  <div class="sb setup">
+    <div class="sbig">✍️</div>
+    <h3>Preparar a Transcrição</h3>
+    <ul>
+      <li>📥 Para a app escrever o que dizes, precisa de descarregar o motor de transcrição <b id="setMb">uma vez só (cerca de 80 MB)</b>.</li>
+      <li>🔒 Depois funciona sempre sem internet, e o que dizes nunca sai do telemóvel.</li>
+      <li>📶 Agora precisa de internet; usa Wi-Fi se puderes.</li>
+      <li>⏳ Se preferires fazer mais tarde, as gravações ficam guardadas em áudio e preparas em ⚙️ Definições.</li>
+    </ul>
+    <div class="setprog" id="setProg" hidden><div class="pb"><i id="setBar"></i></div><span id="setTxt"></span></div>
+  </div>
+  <div class="sf"><button class="btn" id="setLater">Mais Tarde</button><button class="btn pri" id="setGo">⬇️ Preparar Agora</button></div>
 </div>
 
 <!-- Exportar -->
@@ -264,6 +304,12 @@ textarea.field{height:auto;min-height:46vh;padding:10px;resize:none;line-height:
     <div class="menu">
       <button id="mBackup"><span class="i">💾</span><span>Cópia de Segurança<span class="s">Guarda tudo num ficheiro, para mudar de telemóvel</span></span></button>
       <button id="mImport"><span class="i">📥</span><span>Importar<span class="s">Cópia de segurança ou ficheiro .md exportado</span></span></button>
+      <button id="mTr"><span class="i">✍️</span><span>Transcrição<span class="s" id="mTrS">A verificar…</span></span></button>
+      <span class="lbl">Qualidade da Transcrição</span>
+      <div class="opts" id="mQual">
+        <button class="opt" data-v="normal"><span class="i">⚡</span><span class="n">Normal</span><div class="d">Mais rápida · 80 MB</div></button>
+        <button class="opt" data-v="melhor"><span class="i">🎯</span><span class="n">Melhor</span><div class="d">Mais lenta · 250 MB</div></button>
+      </div>
       <label class="tg"><span class="i">🎧</span><span>Guardar Também o Áudio<span class="s">Para ouvir depois; ocupa mais espaço</span></span><input type="checkbox" id="mAudio"></label>
       <button id="mPin"><span class="i">🔒</span><span id="mPinTxt">Definir PIN</span></button>
     </div>
@@ -499,9 +545,10 @@ function render(){
     if(k!==last){html+=`<div class="day">${cap1(fDay(d))}</div>`;last=k}
     const words=e.text.trim().split(/\s+/).length;
     html+=`<div class="entry${st.openId===e.id?' open':''}" data-id="${e.id}">
-      <div class="h"><span>🕒 ${fTime(d)}${e.audio?'<span class="au">🎧</span>':''}</span><span>${e.text.trim()?words+' palavras':'só áudio'}</span></div>
-      <div class="t">${e.text.trim()?hl(e.text):'<i>Sem transcrição. Toca para ouvir.</i>'}</div>
-      ${e.audio&&st.openId===e.id?'<audio controls preload="none" data-au="'+e.id+'"></audio>':''}
+      <div class="h"><span>🕒 ${fTime(d)}${e.audio?'<span class="au">🎧</span>':''}</span><span>${e.text.trim()?words+' palavras':(e.pending?'por transcrever':'só áudio')}</span></div>
+      <div class="t">${e.text.trim()?hl(e.text):TR.label(e)}</div>
+      ${!e.text.trim()&&e.pending&&TR.busy!==e.id?'<button class="trbtn" data-a="tr">📝 Transcrever agora</button>':''}
+      ${e.audio&&st.openId===e.id?'<div data-au="'+e.id+'"></div>':''}
       <div class="acts"><button data-a="edit">✏️ Editar</button><button data-a="del" class="del">🗑️ Apagar</button></div></div>`;
   }
   L.innerHTML=html;
@@ -531,10 +578,12 @@ $('list').onclick=async e=>{
   const a=e.target.closest('[data-a]');
   if(a&&a.dataset.a==='edit'){openEdit(entries.find(x=>x.id===id));return}
   if(a&&a.dataset.a==='del'){if(confirm('Apagar este registo?')){await DB.del(id);try{await DB.req(DB.tx('a','readwrite').delete(id))}catch{}st.openId=null;await load();toast('🗑️ Registo apagado')}return}
+  if(a&&a.dataset.a==='tr'){TR.request(id,true);return}
   if(e.target.closest('audio'))return;
   st.openId=st.openId===id?null:id;render();
-  const au=document.querySelector(`audio[data-au="${id}"]`);
-  if(au){const b=await DB.req(DB.tx('a','readonly').get(id));if(b)au.src=URL.createObjectURL(b)}
+  const box=document.querySelector(`[data-au="${id}"]`);
+  if(box){const b=await DB.req(DB.tx('a','readonly').get(id));const list=Array.isArray(b)?b:(b?[b]:[]);
+    box.innerHTML=list.map((x,i)=>`<audio controls preload="none" src="${URL.createObjectURL(x)}"></audio>`).join('')}
 };
 
 /* ---------- Novo / editar ---------- */
@@ -548,12 +597,7 @@ function openEdit(e,title){
   show('sEdit');setTimeout(()=>$('eText').focus(),50);
 }
 $('bNew').onclick=()=>Rec.start();
-$('bPaste').onclick=async()=>{ // texto copiado no Dictafone: entra com um toque
-  let t='';try{t=(await navigator.clipboard.readText()||'').trim()}catch{}
-  openEdit(null,'📋 Do Dictafone');
-  if(t){$('eText').value=t;$('eText').blur();toast('Confirma a data e guarda')}
-  else toast('Toca na caixa e escolhe Colar');
-};
+
 $('eCancel').onclick=()=>{if($('eText').value.trim()&&!st.editId&&!confirm('Sair sem guardar?'))return;show(null)};
 $('eSave').onclick=async()=>{
   const text=$('eText').value.trim();if(!text){toast('O texto está vazio');return}
@@ -623,7 +667,13 @@ $('xCopy').onclick=async()=>{const t=buildText(exportList(),st.fmt);
 /* ---------- Definições: cópia, importar, PIN ---------- */
 $('bSettings').onclick=async()=>{$('mPinTxt').innerHTML=(await DB.getK('pin'))?'Tirar PIN<span class="s">O diário deixa de pedir PIN ao abrir</span>':'Definir PIN<span class="s">Pede o PIN sempre que abres o diário</span>';
   $('mAudio').checked=!!(await DB.getK('audio'));
+  TR.status();
+  const q=(await DB.getK('qual'))||'normal';document.querySelectorAll('#mQual .opt').forEach(o=>o.classList.toggle('on',o.dataset.v===q));
   $('sInfo').textContent=`${entries.length} registos guardados só neste telemóvel. A cópia de segurança leva só o texto.`;show('sSettings')};
+$('mTr').onclick=()=>TR.openSetup();
+$('mQual').onclick=async e=>{const b=e.target.closest('.opt');if(!b)return;await DB.setK('qual',b.dataset.v);TR.status();
+  document.querySelectorAll('#mQual .opt').forEach(o=>o.classList.toggle('on',o===b));
+  toast(b.dataset.v==='melhor'?'🎯 Próximas gravações com a melhor qualidade':'⚡ Próximas gravações mais rápidas')};
 $('mAudio').onchange=e=>{DB.setK('audio',e.target.checked);toast(e.target.checked?'🎧 O áudio passa a ser guardado':'O áudio deixa de ser guardado')};
 $('mBackup').onclick=async()=>{if(!entries.length){toast('Ainda não há registos');return}
   await saveFile(`diario_copia_${dayKey(new Date())}.json`,JSON.stringify({app:'diario',v:1,entries},null,1),'application/json');
@@ -682,105 +732,129 @@ async function unlock(){const h=await DB.getK('pin');if(!h)return;
   let err='';for(;;){const p=await askPin('Introduz o PIN',false,err);if(await hashPin(p)===h)return;err='PIN errado, tenta outra vez'}}
 
 /* ---------- Gravação: carregar, falar, guardar ---------- */
-const Rec={sr:null,mr:null,stream:null,chunks:[],final:'',interim:'',on:false,t0:0,acc:0,tick:null,lock:null,mode:'',wantAudio:false,restarts:0,got:false,dog:null,lastIn:0,
-  SR:window.SpeechRecognition||window.webkitSpeechRecognition,
+const Rec={mr:null,stream:null,segs:[],chunks:[],on:false,t0:0,acc:0,tick:null,lock:null,ac:null,raf:0,
+  pickMime(){const c=['audio/mp4','audio/webm;codecs=opus','audio/webm','audio/ogg'];for(const m of c){try{if(MediaRecorder.isTypeSupported(m))return m}catch{}}return ''},
   async start(){
-    this.final='';this.interim='';this.chunks=[];this.acc=0;this.restarts=0;this.got=false;this.mr=null;this.lastIn=0;
-    let pref=null;try{this.wantAudio=!!(await DB.getK('audio'));pref=await DB.getK('modo')}catch{}
-    this.mode=(!this.SR||pref==='teclado')?'teclado':'texto';
-    $('rText').value='';$('rAlarm').classList.remove('show');show('sRec');
-    this.go();
+    this.segs=[];this.chunks=[];this.acc=0;this.mr=null;
+    $('rAlarm').classList.remove('show');$('sRec').classList.remove('paused');$('rTimer').textContent='0:00';$('rState').textContent='A pedir o microfone…';show('sRec');
+    try{this.stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}})}
+    catch{show(null);toast('Sem acesso ao microfone. Ativa-o nas definições do telemóvel.');return}
+    this.meter();this.go();
   },
-  go(){ // nada aqui fica à espera do telemóvel: o ecrã responde sempre
-    this.on=true;$('sRec').classList.remove('paused');$('rAlarm').classList.remove('show');
+  newMR(){const m=this.pickMime();const mr=new MediaRecorder(this.stream,m?{mimeType:m,audioBitsPerSecond:48000}:{audioBitsPerSecond:48000});
+    mr.ondataavailable=e=>{if(e.data&&e.data.size)this.chunks.push(e.data)};
+    mr.onstop=()=>{if(this.chunks.length){this.segs.push(new Blob(this.chunks,{type:this.chunks[0].type||m||'audio/mp4'}));this.chunks=[]}
+      if(this.on&&this.mr===mr)this.stopped()};
+    this.mr=mr;mr.start(1000)},
+  async go(){
+    try{
+      if(!this.stream||!this.stream.active||this.stream.getAudioTracks().some(t=>t.readyState==='ended')){
+        this.stream=await navigator.mediaDevices.getUserMedia({audio:true});this.meter();this.mr=null}
+      if(this.mr&&this.mr.state==='paused')this.mr.resume();else if(!this.mr||this.mr.state==='inactive')this.newMR();
+    }catch{this.stopped(true);return}
+    this.on=true;$('sRec').classList.remove('paused');$('rAlarm').classList.remove('show');$('rState').textContent='A gravar…';
+    this.stream.getAudioTracks().forEach(t=>t.onended=()=>this.stopped());
     this.t0=Date.now();clearInterval(this.tick);this.tick=setInterval(()=>this.time(),500);this.time();
     try{navigator.wakeLock&&navigator.wakeLock.request('screen').then(l=>{this.lock=l}).catch(()=>{})}catch{}
-    if(this.mode==='texto'){
-      $('rKb').hidden=true;this.startSR();
-      clearTimeout(this.dog);this.dog=setTimeout(()=>{if(this.on&&!this.got&&this.mode==='texto')this.nudge()},8000);
-    }else this.kbShow();
-    if(this.wantAudio)this.startMR();
-    this.ui();
   },
-  ui(){$('rState').textContent=this.mode==='texto'?'A ouvir e a escrever…':'Ditado do teclado';
-    $('rText').placeholder=this.mode==='texto'?'Começa a falar…':'O que ditares aparece aqui'},
-  nudge(){$('rKbMsg').textContent='Não está a escrever?';$('rKb').hidden=false;$('rAuto').hidden=true},
-  kbShow(){$('rKbMsg').textContent='Toca no botão e depois no 🎤 do teclado';$('rKb').hidden=false;$('rAuto').hidden=!this.SR},
-  kbMode(byUser){ // passa para o ditado do teclado do iPhone
-    clearTimeout(this.dog);const r=this.sr;this.sr=null;try{r&&r.abort()}catch{}
-    if(this.interim){this.final=(this.final+' '+this.interim).trim();this.interim='';this.paint()}
-    this.mode='teclado';if(byUser){try{DB.setK('modo','teclado')}catch{}}
-    this.ui();
-  },
-  startSR(){
-    let r;try{r=new this.SR()}catch{this.kbMode(false);this.kbShow();return}
-    this.sr=r;r.lang='pt-PT';r.continuous=true;r.interimResults=true;
-    r.onresult=e=>{if(this.sr!==r)return;let it='';for(let i=e.resultIndex;i<e.results.length;i++){const x=e.results[i];
-      if(x.isFinal)this.final+=(this.final&&!/\s$/.test(this.final)?' ':'')+x[0].transcript.trim();else it+=x[0].transcript}
-      this.interim=it;this.restarts=0;if(!this.got){this.got=true;$('rKb').hidden=true}this.paint()};
-    r.onerror=e=>{if(this.sr!==r)return;if(['not-allowed','service-not-allowed','network','audio-capture','language-not-supported'].includes(e.error)){
-      this.kbMode(false);this.kbShow();toast('Usa o ditado do teclado')}};
-    r.onend=()=>{if(this.sr!==r)return;
-      if(this.interim){this.final+=(this.final?' ':'')+this.interim.trim();this.interim='';this.paint()}
-      if(!this.on)return;
-      if(document.visibilityState==='visible'&&this.restarts<25){this.restarts++;try{r.start();return}catch{}}
-      this.stopped()};
-    try{r.start()}catch{this.kbMode(false);this.kbShow()}
-  },
-  startMR(){
-    if(this.mr&&this.mr.state==='recording')return;
-    if(this.mr&&this.mr.state==='paused'){try{this.mr.resume()}catch{}return}
-    try{navigator.mediaDevices.getUserMedia({audio:true}).then(st=>{
-      if(!this.on){st.getTracks().forEach(t=>t.stop());return}
-      this.stream=st;const mr=new MediaRecorder(st,{audioBitsPerSecond:32000});this.mr=mr;
-      mr.ondataavailable=e=>{if(e.data&&e.data.size)this.chunks.push(e.data)};mr.start(1000)}).catch(()=>{})}catch{}
-  },
-  time(){const now=Date.now(),sec=Math.floor((this.acc+(this.on?now-this.t0:0))/1000);$('rTimer').textContent=`${Math.floor(sec/60)}:${pad(sec%60)}`;
-    // ditado do teclado: se deixou de entrar texto há 30 s, avisa
-    if(this.on&&this.mode==='teclado'&&this.lastIn&&now-this.lastIn>30000){this.lastIn=0;this.alarm('Parou de escrever?','Toca aqui e depois no 🎤 do teclado');beep()}},
-  paint(){const T=$('rText');T.value=(this.final+(this.interim?' '+this.interim:'')).trim();T.scrollTop=T.scrollHeight},
+  meter(){try{cancelAnimationFrame(this.raf);this.ac&&this.ac.close()}catch{}
+    try{const ac=new (window.AudioContext||window.webkitAudioContext)();this.ac=ac;const an=ac.createAnalyser();an.fftSize=256;ac.createMediaStreamSource(this.stream).connect(an);
+      const d=new Uint8Array(an.frequencyBinCount),bars=[...document.querySelectorAll('#rMeter i')];
+      const loop=()=>{an.getByteFrequencyData(d);bars.forEach((b,i)=>{const v=d[2+i*4]/255;b.style.height=(6+v*38*(this.on?1:0))+'px'});this.raf=requestAnimationFrame(loop)};loop()}catch{}},
+  time(){const sec=Math.floor((this.acc+(this.on?Date.now()-this.t0:0))/1000);$('rTimer').textContent=`${Math.floor(sec/60)}:${pad(sec%60)}`},
   alarm(t,sub){$('rAlarm').innerHTML=`⚠️ ${t}<br><small>${sub}</small>`;$('rAlarm').classList.add('show')},
-  halt(keep){
-    clearTimeout(this.dog);this.acc+=this.on?Date.now()-this.t0:0;this.on=false;clearInterval(this.tick);
-    const r=this.sr;this.sr=null;try{r&&r.abort()}catch{}
-    try{if(this.mr&&this.mr.state==='recording'&&keep)this.mr.pause();else if(this.mr&&this.mr.state!=='inactive')this.mr.stop()}catch{}
-    try{this.lock&&this.lock.release()}catch{}this.lock=null},
   stopped(){ // parou sem querer: avisa
-    if(!this.on)return;
-    if(this.interim){this.final=(this.final+' '+this.interim).trim();this.interim='';this.paint()}
-    this.halt(true);$('sRec').classList.add('paused');this.alarm('A gravação parou','Toca aqui para continuar');$('rState').textContent='Parado';beep()},
-  save(){ // fecha logo e guarda; nunca fica preso
-    let text='';try{text=$('rText').value.trim()}catch{}
-    const acc=this.acc+(this.on?Date.now()-this.t0:0);const mr=this.mr;this.mr=null;
-    try{this.halt()}catch{}
-    try{mr&&mr.state!=='inactive'&&mr.stop()}catch{}
-    show(null);
-    (async()=>{
-      try{
-        await new Promise(r=>setTimeout(r,mr?600:0));
-        const blob=this.chunks.length?new Blob(this.chunks,{type:this.chunks[0].type||'audio/mp4'}):null;
-        try{this.stream&&this.stream.getTracks().forEach(t=>t.stop())}catch{}this.stream=null;
-        if(!text&&!blob){toast('Nada gravado');return}
-        const id=uid();
-        await DB.put({id,date:new Date(Date.now()-acc).toISOString(),text,audio:!!blob});
-        if(blob)await DB.req(DB.tx('a','readwrite').put(blob,id));
-        await load();toast('✔️ Registo guardado');
-      }catch(err){if(text){openEdit(null);$('eText').value=text}toast('Não guardou. O texto está aqui para guardares.')}
-    })();
+    if(!this.on)return;this.acc+=Date.now()-this.t0;this.on=false;clearInterval(this.tick);
+    try{if(this.mr&&this.mr.state==='recording')this.mr.pause()}catch{}
+    try{this.lock&&this.lock.release()}catch{}this.lock=null;
+    $('sRec').classList.add('paused');this.alarm('A gravação parou','Toca aqui para continuar');$('rState').textContent='Parado';beep()},
+  async save(){ // fecha logo e guarda; nunca fica preso
+    const acc=this.acc+(this.on?Date.now()-this.t0:0);this.on=false;clearInterval(this.tick);
+    try{this.lock&&this.lock.release()}catch{}this.lock=null;
+    const mr=this.mr;this.mr=null;show(null);
+    if(mr&&mr.state!=='inactive')await Promise.race([new Promise(r=>{const o=mr.onstop;mr.onstop=ev=>{o&&o(ev);r()};try{mr.stop()}catch{r()}}),new Promise(r=>setTimeout(r,2000))]);
+    if(this.chunks.length){this.segs.push(new Blob(this.chunks,{type:this.chunks[0].type||'audio/mp4'}));this.chunks=[]}
+    this.release();
+    const segs=this.segs.filter(b=>b.size>0);this.segs=[];
+    if(!segs.length||acc<1500){toast('Nada gravado');return}
+    try{
+      const id=uid();
+      await DB.put({id,date:new Date(Date.now()-acc).toISOString(),text:'',audio:true,pending:true,secs:Math.round(acc/1000)});
+      await DB.req(DB.tx('a','readwrite').put(segs,id));
+      await load();toast('✔️ Gravação guardada');TR.request(id);
+    }catch{toast('Não foi possível guardar a gravação')}
   },
-  cancel(){if($('rText').value.trim()&&!confirm('Deitar fora este registo?'))return;
-    try{this.halt()}catch{}this.mr=null;try{this.stream&&this.stream.getTracks().forEach(t=>t.stop())}catch{}this.stream=null;show(null)}
+  release(){try{this.stream&&this.stream.getTracks().forEach(t=>t.stop())}catch{}this.stream=null;try{cancelAnimationFrame(this.raf);this.ac&&this.ac.close()}catch{}this.ac=null},
+  cancel(){if((this.acc+(this.on?Date.now()-this.t0:0))>3000&&!confirm('Deitar fora esta gravação?'))return;
+    this.on=false;clearInterval(this.tick);try{this.mr&&this.mr.state!=='inactive'&&this.mr.stop()}catch{}this.mr=null;this.segs=[];this.chunks=[];this.release();show(null)}
 };
+
+/* ---------- Transcrição (Whisper no telemóvel) ---------- */
+const MODELS={normal:{id:'onnx-community/whisper-base',mb:80,n:'Normal'},melhor:{id:'onnx-community/whisper-small',mb:250,n:'Melhor'}};
+const TR={w:null,queue:[],busy:null,p:0,dl:{},preparing:false,
+  async model(){return MODELS[(await DB.getK('qual'))||'normal']},
+  label(e){if(e.pending&&!TR.isReady&&TR.busy!==e.id)return`<i>🎧 Gravação de ${e.secs?(e.secs<60?e.secs+' s':Math.round(e.secs/60)+' min'):'voz'}. Prepara a transcrição em ⚙️ para ter o texto.</i>`;
+    if(TR.busy===e.id)return`<span class="trst">⏳ A escrever o que disseste… ${Math.round(TR.p*100)}%</span>`;
+    return e.pending?`<i>🎧 Gravação de ${e.secs?(e.secs<60?e.secs+' s':Math.round(e.secs/60)+' min'):'voz'}, ainda sem texto.</i>`:'<i>Sem transcrição. Toca para ouvir.</i>'},
+  worker(){if(!this.w){this.w=new Worker('whisper-worker.js',{type:'module'});this.w.onmessage=e=>this.msg(e.data);
+      this.w.onerror=e=>{this.fail('O motor de transcrição não arrancou neste telemóvel.')}}return this.w},
+  async ready(){const m=await this.model();this.isReady=!!(await DB.getK('ready:'+m.id));return this.isReady},
+  async status(){const m=await this.model(),ok=await this.ready();
+    $('mTrS').textContent=ok?`✔️ Pronta · ${m.n}`:`Por preparar · toca para preparar (${m.mb} MB, com internet)`},
+  async openSetup(){const m=await this.model();$('setMb').textContent=`uma vez só (cerca de ${m.mb} MB)`;
+    $('setProg').hidden=true;$('setGo').disabled=false;$('setGo').textContent='⬇️ Preparar Agora';show('sSetup')},
+  async prepare(){const m=await this.model();this.preparing=true;this.dl={};
+    $('setProg').hidden=false;$('setBar').style.width='2%';$('setTxt').textContent='A ligar…';$('setGo').disabled=true;$('setGo').textContent='A preparar…';
+    this.worker().postMessage({cmd:'load',model:m.id})},
+  async request(id,user){
+    if(!(await this.ready())){if(user)this.openSetup();return}
+    if(!this.queue.includes(id)&&this.busy!==id)this.queue.push(id);this.next();
+  },
+  async next(){if(this.busy||!this.queue.length)return;const id=this.queue.shift();
+    this.busy=id;this.p=0;render();
+    try{const b=await DB.req(DB.tx('a','readonly').get(id));const segs=Array.isArray(b)?b:(b?[b]:[]);
+      if(!segs.length)throw new Error('sem áudio');
+      const pcm=await toPCM(segs);const m=await this.model();
+      this.worker().postMessage({id,audio:pcm,model:m.id,lang:'portuguese'},[pcm.buffer]);
+    }catch(err){this.fail('Não consegui ler esta gravação.')}},
+  async msg(d){
+    if(d.type==='dl'){const p=d.p;if(p.status==='progress'&&p.file){this.dl[p.file]=[p.loaded||0,p.total||0]}
+      const v=Object.values(this.dl),L=v.reduce((a,x)=>a+x[0],0),T=v.reduce((a,x)=>a+x[1],0);
+      if(T){const pc=Math.round(L/T*100);
+        if(this.preparing){$('setBar').style.width=Math.max(2,pc)+'%';$('setTxt').textContent=`A descarregar… ${pc}% (${Math.round(L/1048576)} de ${Math.round(T/1048576)} MB)`}
+        else{$('dlBar').hidden=false;$('dlBar').innerHTML=`⬇️ A preparar a transcrição (só desta vez)… <b>${pc}%</b>`}}}
+    else if(d.type==='ready'){$('dlBar').hidden=true;await DB.setK('ready:'+d.model,true);this.isReady=true;render();await DB.setK('setupSeen',true);
+      if(this.preparing){this.preparing=false;$('setBar').style.width='100%';$('setTxt').textContent='✔️ Pronto. A partir de agora funciona sem internet.';$('setGo').textContent='✔️ Pronto';
+        setTimeout(()=>{if($('sSetup').classList.contains('show'))show(null)},1500);
+        entries.filter(e=>e.pending&&e.audio).forEach(e=>this.request(e.id))}}
+    else if(d.type==='prog'){this.p=d.p;const el=document.querySelector(`.entry[data-id="${d.id}"] .trst`);if(el)el.textContent=`⏳ A escrever o que disseste… ${Math.round(d.p*100)}%`}
+    else if(d.type==='done'){const e=entries.find(x=>x.id===d.id);
+      if(e){e.text=d.text;e.pending=!d.text;const keep=!!(await DB.getK('audio'));
+        if(d.text&&!keep){e.audio=false;try{await DB.req(DB.tx('a','readwrite').delete(e.id))}catch{}}
+        const {...rec}=e;await DB.put(rec)}
+      this.busy=null;await load();toast(d.text?'✔️ Texto pronto':'Não percebi nada nesta gravação');this.next()}
+    else if(d.type==='err'){
+      if(this.preparing){this.preparing=false;$('setTxt').textContent='Não consegui descarregar. Confirma que tens internet e tenta outra vez.';$('setGo').disabled=false;$('setGo').textContent='🔄 Tentar Outra Vez';try{this.w&&this.w.terminate()}catch{}this.w=null;return}
+      this.fail('A transcrição falhou: '+d.msg.slice(0,80))}
+  },
+  fail(m){$('dlBar').hidden=true;this.busy=null;render();toast(m);try{this.w&&this.w.terminate()}catch{}this.w=null;setTimeout(()=>this.next(),500)}
+};
+async function toPCM(segs){ // áudio → 16 kHz mono, como o Whisper precisa
+  const Ctx=window.AudioContext||window.webkitAudioContext;const ac=new Ctx();const parts=[];
+  try{for(const b of segs){const buf=await ac.decodeAudioData(await b.arrayBuffer());
+    const len=Math.ceil(buf.duration*16000);const off=new OfflineAudioContext(1,len,16000);
+    const src=off.createBufferSource();src.buffer=buf;src.connect(off.destination);src.start();
+    parts.push((await off.startRendering()).getChannelData(0))}}finally{try{ac.close()}catch{}}
+  const n=parts.reduce((a,p)=>a+p.length,0),out=new Float32Array(n);let o=0;for(const p of parts){out.set(p,o);o+=p.length}return out}
 function beep(){try{const c=new (window.AudioContext||window.webkitAudioContext)();
   [0,.35,.7].forEach(t=>{const o=c.createOscillator(),g=c.createGain();o.frequency.value=880;g.gain.value=.25;o.connect(g);g.connect(c.destination);o.start(c.currentTime+t);o.stop(c.currentTime+t+.2)});
   setTimeout(()=>c.close(),1500)}catch{}
   try{navigator.vibrate&&navigator.vibrate([300,150,300])}catch{}}
 $('rSave').onclick=()=>Rec.save();
+$('setGo').onclick=()=>TR.prepare();
+$('setLater').onclick=async()=>{await DB.setK('setupSeen',true);show(null);if(!TR.preparing)toast('Preparas depois em ⚙️ Definições, com internet')};
 $('rCancel').onclick=()=>Rec.cancel();
-$('rAlarm').onclick=()=>{if(Rec.on){$('rAlarm').classList.remove('show');Rec.lastIn=Date.now();$('rText').focus();return}Rec.restarts=0;Rec.go()};
-$('rAuto').onclick=()=>{try{DB.delK('modo')}catch{}Rec.mode='texto';Rec.got=false;Rec.restarts=0;Rec.halt();Rec.go()};
-$('rKbBtn').onclick=()=>{Rec.kbMode(true);$('rKb').hidden=true;$('rText').focus();Rec.lastIn=Date.now()};
-$('rText').oninput=()=>{Rec.final=$('rText').value;Rec.interim='';if(Rec.mode==='teclado')Rec.lastIn=Date.now()};
+$('rAlarm').onclick=()=>{if(!Rec.on)Rec.go()};
 document.addEventListener('visibilitychange',()=>{
   if(document.visibilityState==='hidden'&&Rec.on)Rec.stopped();          // bloqueou o ecrã ou mudou de app
   else if(document.visibilityState==='visible'&&$('rAlarm').classList.contains('show'))beep(); // ao voltar, lembra que parou
@@ -799,6 +873,9 @@ async function fromLink(){
   await DB.open();
   try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch{}
   await unlock();await fromLink();await load();
+  try{TR.isReady=await TR.ready();
+    if(TR.isReady)entries.filter(e=>e.pending&&e.audio).forEach(e=>TR.request(e.id));
+    else if(!(await DB.getK('setupSeen')))TR.openSetup();}catch{}
   addEventListener('hashchange',async()=>{if(/^#add=/.test(location.hash)){await fromLink();await load()}});
   if('serviceWorker'in navigator&&location.protocol!=='file:')navigator.serviceWorker.register('sw.js').catch(()=>{});
 })();
