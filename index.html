@@ -279,7 +279,7 @@ textarea.field{height:auto;min-height:46vh;padding:10px;resize:none;line-height:
   <div class="mbody" id="mStep1">
     <h3>✍️ Transcrição no Telemóvel</h3>
     <ul>
-      <li>📥 Para escrever o que dizes, a app instala o motor de transcrição <b id="setMb">uma vez só (cerca de 100 MB)</b>.</li>
+      <li>📥 Para escrever o que dizes, a app instala o motor de transcrição <b id="setMb">uma vez só (cerca de 200 MB)</b>.</li>
       <li>🔒 Depois funciona sem internet e o que dizes nunca sai do telemóvel.</li>
       <li>📶 Agora precisa de internet; usa Wi-Fi se puderes.</li>
     </ul>
@@ -343,8 +343,8 @@ textarea.field{height:auto;min-height:46vh;padding:10px;resize:none;line-height:
       <button id="mTr"><span class="i">✍️</span><span>Transcrição<span class="s" id="mTrS">A verificar…</span></span></button>
       <span class="lbl">Qualidade da Transcrição</span>
       <div class="opts" id="mQual">
-        <button class="opt" data-v="normal"><span class="i">⚡</span><span class="n">Normal</span><div class="d">Mais rápida · 100 MB</div></button>
-        <button class="opt" data-v="melhor"><span class="i">🎯</span><span class="n">Melhor</span><div class="d">Mais lenta · 350 MB</div></button>
+        <button class="opt" data-v="normal"><span class="i">⚡</span><span class="n">Normal</span><div class="d">Mais rápida · 200 MB</div></button>
+        <button class="opt" data-v="melhor"><span class="i">🎯</span><span class="n">Melhor</span><div class="d">Mais lenta · 500 MB</div></button>
       </div>
       <label class="tg"><span class="i">🎧</span><span>Guardar Também o Áudio<span class="s">Para ouvir depois; ocupa mais espaço</span></span><input type="checkbox" id="mAudio"></label>
       <button id="mPin"><span class="i">🔒</span><span id="mPinTxt">Definir PIN</span></button>
@@ -827,7 +827,7 @@ const Rec={mr:null,stream:null,segs:[],chunks:[],on:false,t0:0,acc:0,tick:null,l
 };
 
 /* ---------- Transcrição (Whisper no telemóvel) ---------- */
-const MODELS={normal:{id:'onnx-community/whisper-base',mb:100,n:'Normal'},melhor:{id:'onnx-community/whisper-small',mb:350,n:'Melhor'}};
+const MODELS={normal:{id:'onnx-community/whisper-base',mb:200,n:'Normal'},melhor:{id:'onnx-community/whisper-small',mb:500,n:'Melhor'}};
 const TR={w:null,queue:[],busy:null,p:0,dl:{},preparing:false,
   async model(){return MODELS[(await DB.getK('qual'))||'normal']},
   label(e){if(TR.busy===e.id)return`<span class="trst">⏳ A escrever o que disseste… ${Math.round(TR.p*100)}%</span>`;
@@ -878,7 +878,7 @@ const TR={w:null,queue:[],busy:null,p:0,dl:{},preparing:false,
     if(d.type==='dl'){const p=d.p;if(p.status==='progress'&&p.file){this.dl[p.file]=[p.loaded||0,p.total||0]}
       const v=Object.values(this.dl),L=v.reduce((a,x)=>a+x[0],0),T=v.reduce((a,x)=>a+x[1],0);
       if(T){const pc=Math.round(L/T*100);
-        if(this.preparing){$('setBar').style.width=Math.max(2,pc)+'%';$('setTxt').textContent=pc>=100?'A preparar o motor…':`${pc}% · ${Math.round(L/1048576)} de ${Math.round(T/1048576)} MB`}
+        if(this.preparing){$('setBar').style.width=Math.max(2,pc)+'%';$('setTxt').textContent=pc>=100&&T>150*1048576?'A preparar o motor…':`${pc}% · ${Math.round(L/1048576)} de ${Math.round(T/1048576)} MB`}
         else{$('dlBar').hidden=false;$('dlBar').innerHTML=`⬇️ A preparar a transcrição (só desta vez)… <b>${pc}%</b>`}}}
     else if(d.type==='ready'){$('dlBar').hidden=true;await DB.setK('ready:'+d.model,true);await DB.setK('gpuTry',false);this.isReady=true;render();await DB.setK('setupSeen',true);
       if(this.preparing){this.preparing=false;this.step(3);
